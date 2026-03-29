@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #0f0f0f;
-      color: #ffffff;
-    }
+    body { font-family: 'Roboto', sans-serif; background: #0f0f0f; color: #fff; }
     .navbar {
       position: fixed; top: 0; left: 0; right: 0; height: 56px;
       background: #0f0f0f; border-bottom: 1px solid #2a2a2a;
@@ -27,7 +21,7 @@
     .search-bar { flex: 1; max-width: 600px; margin: 0 20px; display: flex; }
     .search-bar input {
       flex: 1; background: #121212; border: 1px solid #2a2a2a;
-      border-radius: 40px 0 0 40px; padding: 8px 16px; color: white;
+      border-radius: 40px 0 0 40px; padding: 8px 16px; color: #fff;
       font-size: 14px; outline: none;
     }
     .search-bar button {
@@ -36,7 +30,7 @@
     }
     .btn-upload, .btn-signin {
       background: #2a2a2a; border: none; padding: 8px 16px;
-      border-radius: 40px; color: white; cursor: pointer; margin-left: 8px;
+      border-radius: 40px; color: #fff; cursor: pointer; margin-left: 8px;
     }
     .btn-upload { background: #ff4444; }
     .avatar {
@@ -53,27 +47,15 @@
       display: flex; align-items: center; gap: 16px; padding: 8px 24px;
       cursor: pointer; color: #aaa; border-radius: 10px; margin: 0 8px;
     }
-    .sidebar-item:hover { background: #272727; color: white; }
+    .sidebar-item:hover { background: #272727; color: #fff; }
     .sidebar-item i { width: 22px; }
     .sidebar-divider { height: 1px; background: #2a2a2a; margin: 12px 16px; }
     .sidebar-label { font-size: 12px; color: #777; padding: 8px 24px; }
-    .main-content {
-      margin-left: 220px; margin-top: 56px; padding: 20px;
-      min-height: calc(100vh - 56px);
-    }
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px;
-    }
+    .main-content { margin-left: 220px; margin-top: 56px; padding: 20px; min-height: calc(100vh - 56px); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
     .section-title { font-size: 20px; font-weight: 600; }
-    .live-badge {
-      background: #ff4444; font-size: 11px; padding: 2px 8px;
-      border-radius: 12px; margin-left: 10px;
-    }
-    .video-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
+    .live-badge { background: #ff4444; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 10px; }
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
     .video-card { cursor: pointer; transition: transform 0.2s; }
     .video-card:hover { transform: translateY(-2px); }
     .thumbnail {
@@ -92,11 +74,7 @@
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; flex-shrink: 0;
     }
-    .video-details h3 {
-      font-size: 14px; font-weight: 500; margin-bottom: 4px;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    .video-details h3 { font-size: 14px; font-weight: 500; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .video-details p { font-size: 12px; color: #aaa; }
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.9);
@@ -110,19 +88,17 @@
     }
     .modal h2 { margin-bottom: 20px; }
     .field { margin-bottom: 16px; }
-    .field label {
-      display: block; font-size: 12px; color: #aaa; margin-bottom: 6px;
-    }
+    .field label { display: block; font-size: 12px; color: #aaa; margin-bottom: 6px; }
     .field input, .field select {
       width: 100%; background: #2a2a2a; border: 1px solid #3a3a3a;
-      border-radius: 8px; padding: 10px; color: white;
+      border-radius: 8px; padding: 10px; color: #fff;
     }
     .btn-primary {
-      background: #ff4444; color: white; border: none; padding: 12px;
+      background: #ff4444; color: #fff; border: none; padding: 12px;
       border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%;
     }
     .btn-secondary {
-      background: #2a2a2a; color: white; border: none; padding: 12px;
+      background: #2a2a2a; color: #fff; border: none; padding: 12px;
       border-radius: 40px; cursor: pointer; width: 100%; margin-top: 10px;
     }
     .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -130,28 +106,17 @@
       flex: 1; text-align: center; padding: 10px; cursor: pointer;
       border-radius: 40px; background: #2a2a2a; color: #aaa;
     }
-    .auth-tab.active { background: #ff4444; color: white; }
+    .auth-tab.active { background: #ff4444; color: #fff; }
     .player-overlay {
       position: fixed; inset: 0; background: #0f0f0f; z-index: 300;
       display: none; overflow-y: auto;
     }
     .player-overlay.open { display: block; }
-    .player-container {
-      max-width: 1200px; margin: 0 auto; padding: 20px;
-    }
-    .video-player video {
-      width: 100%; aspect-ratio: 16/9; background: black;
-      border-radius: 12px;
-    }
-    .player-title {
-      font-size: 18px; font-weight: 600; margin: 16px 0 8px;
-    }
-    .player-stats {
-      color: #aaa; font-size: 14px; margin-bottom: 16px;
-    }
-    .action-buttons {
-      display: flex; gap: 16px; margin-bottom: 20px;
-    }
+    .player-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .video-player video { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
+    .player-title { font-size: 18px; font-weight: 600; margin: 16px 0 8px; }
+    .player-stats { color: #aaa; font-size: 14px; margin-bottom: 16px; }
+    .action-buttons { display: flex; gap: 16px; margin-bottom: 20px; }
     .action-btn {
       background: none; border: none; color: #aaa; padding: 8px 16px;
       border-radius: 40px; cursor: pointer; display: flex; align-items: center;
@@ -165,9 +130,7 @@
       padding: 16px 0; border-top: 1px solid #2a2a2a;
       border-bottom: 1px solid #2a2a2a; margin-bottom: 20px;
     }
-    .channel-left {
-      display: flex; align-items: center; gap: 16px; cursor: pointer;
-    }
+    .channel-left { display: flex; align-items: center; gap: 16px; cursor: pointer; }
     .channel-avatar-lg {
       width: 48px; height: 48px; border-radius: 50%; background: #2a2a2a;
       display: flex; align-items: center; justify-content: center; overflow: hidden;
@@ -176,19 +139,15 @@
     .channel-info p { font-size: 12px; color: #aaa; }
     .subscribe-btn {
       background: #ff4444; border: none; padding: 8px 16px;
-      border-radius: 40px; color: white; font-weight: 600; cursor: pointer;
+      border-radius: 40px; color: #fff; font-weight: 600; cursor: pointer;
     }
-    .subscribe-btn.subscribed {
-      background: #2a2a2a; color: #aaa;
-    }
+    .subscribe-btn.subscribed { background: #2a2a2a; color: #aaa; }
     .description {
       background: #1a1a1a; padding: 16px; border-radius: 12px;
       margin-bottom: 24px; font-size: 14px; line-height: 1.5;
     }
     .comments-section h4 { margin-bottom: 16px; }
-    .comment {
-      display: flex; gap: 12px; margin-bottom: 16px;
-    }
+    .comment { display: flex; gap: 12px; margin-bottom: 16px; }
     .comment-avatar {
       width: 32px; height: 32px; border-radius: 50%; background: #2a2a2a;
       display: flex; align-items: center; justify-content: center;
@@ -197,44 +156,23 @@
     .comment-author { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
     .comment-text { font-size: 14px; margin-bottom: 4px; }
     .comment-time { font-size: 11px; color: #aaa; }
-    .comment-input-area {
-      display: flex; gap: 12px; margin-top: 20px;
-    }
+    .comment-input-area { display: flex; gap: 12px; margin-top: 20px; }
     .comment-input-area input {
       flex: 1; background: #1a1a1a; border: 1px solid #2a2a2a;
-      border-radius: 40px; padding: 10px 16px; color: white;
+      border-radius: 40px; padding: 10px 16px; color: #fff;
     }
     .related-videos { margin-top: 20px; }
-    .related-card {
-      display: flex; gap: 12px; cursor: pointer; margin-bottom: 16px;
-    }
-    .related-thumb {
-      width: 120px; aspect-ratio: 16/9; background: #1a1a1a;
-      border-radius: 8px; overflow: hidden;
-    }
+    .related-card { display: flex; gap: 12px; cursor: pointer; margin-bottom: 16px; }
+    .related-thumb { width: 120px; aspect-ratio: 16/9; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
     .related-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .related-info h4 { font-size: 13px; margin-bottom: 4px; }
     .related-info p { font-size: 11px; color: #aaa; }
-    .toast-container {
-      position: fixed; bottom: 20px; right: 20px; z-index: 400;
-    }
-    .toast {
-      background: #1a1a1a; border-left: 3px solid #ff4444;
-      padding: 12px 16px; border-radius: 8px; margin-top: 8px;
-    }
-    .loader {
-      display: flex; justify-content: center; padding: 40px;
-    }
-    .spinner {
-      width: 40px; height: 40px; border: 3px solid #2a2a2a;
-      border-top-color: #ff4444; border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 400; }
+    .toast { background: #1a1a1a; border-left: 3px solid #ff4444; padding: 12px 16px; border-radius: 8px; margin-top: 8px; }
+    .loader { display: flex; justify-content: center; padding: 40px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #2a2a2a; border-top-color: #ff4444; border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 768px) {
-      .sidebar { transform: translateX(-220px); }
-      .main-content { margin-left: 0; }
-    }
+    @media (max-width: 768px) { .sidebar { transform: translateX(-220px); } .main-content { margin-left: 0; } }
   </style>
 </head>
 <body>
@@ -244,7 +182,7 @@
 
 <script>
 // ============================================================
-// SUPABASE CREDENTIALS - YOUR DATABASE
+// SUPABASE CREDENTIALS
 // ============================================================
 const SUPABASE_URL = 'https://jgjttaalzpxhjxhtxkir.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanR0YWFsenB4aGp4aHR4a2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NjM5OTIsImV4cCI6MjA5MDMzOTk5Mn0.WCjIpGL_xXIWXKA8a-GLWCoYXqHjy1BSPhRKm_PxGiA';
@@ -350,9 +288,7 @@ async function openPlayer(videoId) {
   modal.innerHTML = `
     <div class="player-container">
       <button onclick="closePlayer()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;margin-bottom:16px;">← Back</button>
-      <div class="video-player">
-        <video controls autoplay src="${video.video_url}"></video>
-      </div>
+      <div class="video-player"><video controls autoplay src="${video.video_url}"></video></div>
       <div class="player-title">${escapeHtml(video.title)}</div>
       <div class="player-stats">${formatViews(video.views)} views • ${getTimeAgo(video.created_at)}</div>
       <div class="action-buttons">
@@ -550,14 +486,8 @@ async function openChannelPage(userId) {
   }
 }
 
-// ============================================================
-// UPLOAD FUNCTION - FIXED VERSION
-// ============================================================
 function openUploadModal() {
-  if (!currentUser) { 
-    openAuthModal(); 
-    return; 
-  }
+  if (!currentUser) { openAuthModal(); return; }
   
   const modal = document.createElement('div');
   modal.className = 'modal-overlay open';
@@ -565,66 +495,30 @@ function openUploadModal() {
   modal.innerHTML = `
     <div class="modal">
       <h2><i class="fas fa-upload"></i> Upload Video</h2>
-      <div class="field">
-        <label>Title *</label>
-        <input type="text" id="uploadTitle" placeholder="Enter video title">
-      </div>
-      <div class="field">
-        <label>Description</label>
-        <input type="text" id="uploadDesc" placeholder="Tell viewers about this video">
-      </div>
-      <div class="field">
-        <label>Category</label>
+      <div class="field"><label>Title *</label><input type="text" id="uploadTitle" placeholder="Video title"></div>
+      <div class="field"><label>Description</label><input type="text" id="uploadDesc" placeholder="Description"></div>
+      <div class="field"><label>Category</label>
         <select id="uploadCat">
-          <option value="other">Other</option>
-          <option value="music">Music</option>
-          <option value="gaming">Gaming</option>
-          <option value="tech">Tech</option>
-          <option value="education">Education</option>
-          <option value="sports">Sports</option>
-          <option value="vlogs">Vlogs</option>
-          <option value="comedy">Comedy</option>
+          <option value="other">Other</option><option value="music">Music</option><option value="gaming">Gaming</option>
+          <option value="tech">Tech</option><option value="education">Education</option><option value="sports">Sports</option>
+          <option value="vlogs">Vlogs</option><option value="comedy">Comedy</option>
         </select>
       </div>
-      <div class="field">
-        <label>Video File (MP4, MOV, WebM) *</label>
-        <input type="file" id="videoFile" accept="video/*">
-        <p style="font-size:11px; color:#777; margin-top:5px;">Max file size: 500MB</p>
-      </div>
-      <div class="field">
-        <label>Thumbnail Image (optional)</label>
-        <input type="file" id="thumbFile" accept="image/*">
-      </div>
-      <div id="uploadProgress" style="display:none; margin:10px 0">
-        <div style="background:#2a2a2a; border-radius:40px; height:6px">
-          <div id="progressBar" style="width:0%; height:100%; background:#ff4444; border-radius:40px"></div>
-        </div>
-        <p style="font-size:12px; margin-top:5px" id="progressText">Uploading...</p>
-      </div>
-      <button class="btn-primary" id="doUploadBtn">Upload Video</button>
+      <div class="field"><label>Video File</label><input type="file" id="videoFile" accept="video/*"></div>
+      <div class="field"><label>Thumbnail (optional)</label><input type="file" id="thumbFile" accept="image/*"></div>
+      <div id="uploadProgress" style="display:none;margin:10px 0"><div style="background:#2a2a2a;border-radius:40px;height:6px"><div id="progressBar" style="width:0%;height:100%;background:#ff4444;border-radius:40px"></div></div><p style="font-size:12px;margin-top:5px" id="progressText">Uploading...</p></div>
+      <button class="btn-primary" id="doUploadBtn">Upload</button>
       <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
-      <div id="uploadError" style="color:#ff4444; font-size:12px; margin-top:10px; text-align:center"></div>
+      <div id="uploadError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
     </div>
   `;
   document.body.appendChild(modal);
   
   document.getElementById('doUploadBtn').onclick = async () => {
     const title = document.getElementById('uploadTitle').value.trim();
-    if (!title) {
-      document.getElementById('uploadError').innerText = 'Title is required';
-      return;
-    }
-    
+    if (!title) { document.getElementById('uploadError').innerText = 'Title required'; return; }
     const videoFile = document.getElementById('videoFile').files[0];
-    if (!videoFile) {
-      document.getElementById('uploadError').innerText = 'Please select a video file';
-      return;
-    }
-    
-    if (videoFile.size > 500 * 1024 * 1024) {
-      document.getElementById('uploadError').innerText = 'File too large (max 500MB)';
-      return;
-    }
+    if (!videoFile) { document.getElementById('uploadError').innerText = 'Select a video'; return; }
     
     const btn = document.getElementById('doUploadBtn');
     btn.disabled = true;
@@ -632,26 +526,14 @@ function openUploadModal() {
     document.getElementById('uploadProgress').style.display = 'block';
     
     try {
-      // Upload video
       const fileExt = videoFile.name.split('.').pop();
       const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await sb.storage
-        .from('videos')
-        .upload(fileName, videoFile);
+      const { error: uploadError } = await sb.storage.from('videos').upload(fileName, videoFile);
+      if (uploadError) { throw new Error(uploadError.message); }
       
-      if (uploadError) {
-        document.getElementById('uploadError').innerText = 'Upload failed: ' + uploadError.message;
-        btn.disabled = false;
-        btn.textContent = 'Upload Video';
-        document.getElementById('uploadProgress').style.display = 'none';
-        return;
-      }
+      const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(fileName);
       
-      const { data: urlData } = sb.storage.from('videos').getPublicUrl(fileName);
-      const videoUrl = urlData.publicUrl;
-      
-      // Upload thumbnail if provided
       let thumbnailUrl = null;
       const thumbFile = document.getElementById('thumbFile').files[0];
       if (thumbFile) {
@@ -662,44 +544,32 @@ function openUploadModal() {
         thumbnailUrl = thumbData.publicUrl;
       }
       
-      // Save to database
       const { error: dbError } = await sb.from('videos').insert({
         user_id: currentUser.id,
         username: currentUser.email?.split('@')[0] || 'User',
         title: title,
-        description: document.getElementById('uploadDesc').value || '',
+        description: document.getElementById('uploadDesc').value,
         category: document.getElementById('uploadCat').value,
-        video_url: videoUrl,
+        video_url: publicUrl,
         thumbnail_url: thumbnailUrl,
-        views: 0,
-        likes: 0,
-        dislikes: 0
+        views: 0, likes: 0, dislikes: 0
       });
       
-      if (dbError) {
-        document.getElementById('uploadError').innerText = 'Database error: ' + dbError.message;
-        btn.disabled = false;
-        btn.textContent = 'Upload Video';
-        document.getElementById('uploadProgress').style.display = 'none';
-        return;
-      }
+      if (dbError) throw new Error(dbError.message);
       
-      showToast('Video uploaded successfully!');
+      showToast('Video uploaded!');
       closeUploadModal();
       loadVideos();
-      
     } catch (err) {
-      document.getElementById('uploadError').innerText = 'Error: ' + err.message;
+      document.getElementById('uploadError').innerText = err.message;
       btn.disabled = false;
-      btn.textContent = 'Upload Video';
+      btn.textContent = 'Upload';
       document.getElementById('uploadProgress').style.display = 'none';
     }
   };
 }
 
-function closeUploadModal() { 
-  document.getElementById('uploadModal')?.remove(); 
-}
+function closeUploadModal() { document.getElementById('uploadModal')?.remove(); }
 
 function openAuthModal() {
   const modal = document.createElement('div');
@@ -708,21 +578,9 @@ function openAuthModal() {
   modal.innerHTML = `
     <div class="modal">
       <h2>APILAGE TUBE</h2>
-      <div class="auth-tabs">
-        <div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div>
-        <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
-      </div>
-      <div id="signinForm">
-        <div class="field"><label>Email</label><input type="email" id="signinEmail"></div>
-        <div class="field"><label>Password</label><input type="password" id="signinPassword"></div>
-        <button class="btn-primary" onclick="handleSignIn()">Sign In</button>
-      </div>
-      <div id="signupForm" style="display:none">
-        <div class="field"><label>Username</label><input type="text" id="signupName"></div>
-        <div class="field"><label>Email</label><input type="email" id="signupEmail"></div>
-        <div class="field"><label>Password (min 6 chars)</label><input type="password" id="signupPassword"></div>
-        <button class="btn-primary" onclick="handleSignUp()">Create Account</button>
-      </div>
+      <div class="auth-tabs"><div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div><div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div></div>
+      <div id="signinForm"><div class="field"><label>Email</label><input type="email" id="signinEmail"></div><div class="field"><label>Password</label><input type="password" id="signinPassword"></div><button class="btn-primary" onclick="handleSignIn()">Sign In</button></div>
+      <div id="signupForm" style="display:none"><div class="field"><label>Username</label><input type="text" id="signupName"></div><div class="field"><label>Email</label><input type="email" id="signupEmail"></div><div class="field"><label>Password (min 6)</label><input type="password" id="signupPassword"></div><button class="btn-primary" onclick="handleSignUp()">Create Account</button></div>
       <div id="authError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
       <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
     </div>
@@ -730,36 +588,21 @@ function openAuthModal() {
   document.body.appendChild(modal);
 }
 
-function closeAuthModal() { 
-  document.getElementById('authModal')?.remove(); 
-}
+function closeAuthModal() { document.getElementById('authModal')?.remove(); }
 
 function switchAuthTab(tab) {
-  const signinForm = document.getElementById('signinForm');
-  const signupForm = document.getElementById('signupForm');
+  document.getElementById('signinForm').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
   const tabs = document.querySelectorAll('.auth-tab');
-  
-  if (tab === 'signin') {
-    signinForm.style.display = 'block';
-    signupForm.style.display = 'none';
-    tabs[0].classList.add('active');
-    tabs[1].classList.remove('active');
-  } else {
-    signinForm.style.display = 'none';
-    signupForm.style.display = 'block';
-    tabs[0].classList.remove('active');
-    tabs[1].classList.add('active');
-  }
+  tabs[0].classList.toggle('active', tab === 'signin');
+  tabs[1].classList.toggle('active', tab === 'signup');
 }
 
 async function handleSignIn() {
   const email = document.getElementById('signinEmail').value.trim();
   const password = document.getElementById('signinPassword').value;
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { 
-    document.getElementById('authError').innerText = error.message; 
-    return; 
-  }
+  if (error) { document.getElementById('authError').innerText = error.message; return; }
   closeAuthModal();
   showToast('Signed in!');
   setTimeout(() => location.reload(), 500);
@@ -769,44 +612,21 @@ async function handleSignUp() {
   const username = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-  
-  if (password.length < 6) { 
-    document.getElementById('authError').innerText = 'Password must be at least 6 characters'; 
-    return; 
-  }
-  
-  const { data, error } = await sb.auth.signUp({ 
-    email, 
-    password, 
-    options: { data: { username } } 
-  });
-  
-  if (error) { 
-    document.getElementById('authError').innerText = error.message; 
-    return; 
-  }
-  
-  showToast('Account created! Please sign in.');
+  if (password.length < 6) { document.getElementById('authError').innerText = 'Password min 6 chars'; return; }
+  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { username } } });
+  if (error) { document.getElementById('authError').innerText = error.message; return; }
+  showToast('Account created! Sign in now.');
   switchAuthTab('signin');
   document.getElementById('signinEmail').value = email;
 }
 
-async function signOut() { 
-  await sb.auth.signOut(); 
-  location.reload(); 
-}
+async function signOut() { await sb.auth.signOut(); location.reload(); }
 
 function updateAuthUI() {
   const container = document.getElementById('authContainer');
   if (!container) return;
-  
   if (currentUser) {
-    container.innerHTML = `
-      <div class="avatar" onclick="toggleUserMenu()">${currentUser.email?.charAt(0).toUpperCase() || 'U'}</div>
-      <div id="userMenu" style="display:none;position:absolute;top:50px;right:20px;background:#1a1a1a;border-radius:12px;padding:8px;z-index:200">
-        <div class="sidebar-item" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
-      </div>
-    `;
+    container.innerHTML = `<div class="avatar" onclick="toggleUserMenu()">${currentUser.email?.charAt(0).toUpperCase() || 'U'}</div><div id="userMenu" style="display:none;position:absolute;top:50px;right:20px;background:#1a1a1a;border-radius:12px;padding:8px;z-index:200"><div class="sidebar-item" onclick="signOut()">Sign Out</div></div>`;
   } else {
     container.innerHTML = `<button class="btn-signin" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>`;
   }
@@ -854,13 +674,11 @@ function myChannel() {
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) currentUser = session.user;
-  
   sb.auth.onAuthStateChange((event, session) => {
     currentUser = session?.user || null;
     updateAuthUI();
     loadVideos();
   });
-  
   renderApp();
 }
 
@@ -869,14 +687,8 @@ function renderApp() {
   app.innerHTML = `
     <div class="navbar">
       <div class="logo" onclick="goHome()">APILAGE <span>TUBE</span></div>
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search videos...">
-        <button onclick="currentCategory='all';loadVideos()"><i class="fas fa-search"></i></button>
-      </div>
-      <div style="display:flex">
-        <button class="btn-upload" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button>
-        <div id="authContainer"></div>
-      </div>
+      <div class="search-bar"><input type="text" id="searchInput" placeholder="Search..."><button onclick="currentCategory='all';loadVideos()"><i class="fas fa-search"></i></button></div>
+      <div style="display:flex"><button class="btn-upload" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button><div id="authContainer"></div></div>
     </div>
     <div class="sidebar">
       <div class="sidebar-item" onclick="goHome()"><i class="fas fa-home"></i> Home</div>
@@ -894,24 +706,18 @@ function renderApp() {
       <div class="sidebar-item" onclick="setCategory('comedy')"><i class="fas fa-laugh"></i> Comedy</div>
     </div>
     <div class="main-content">
-      <div class="section-header">
-        <div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div>
-      </div>
+      <div class="section-header"><div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div></div>
       <div id="videoGrid" class="video-grid"></div>
       <div id="loader" class="loader"><div class="spinner"></div></div>
     </div>
   `;
-  
   updateAuthUI();
   loadVideos();
 }
 
-// Close user menu when clicking outside
 document.addEventListener('click', (e) => {
   const menu = document.getElementById('userMenu');
-  if (menu && !e.target.closest('#authContainer')) {
-    menu.style.display = 'none';
-  }
+  if (menu && !e.target.closest('#authContainer')) menu.style.display = 'none';
 });
 
 init();

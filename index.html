@@ -26,31 +26,8 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-  /* SETUP SCREEN */
-  #setup-screen {
-    display:flex; align-items:center; justify-content:center;
-    min-height:100vh; background:var(--bg); padding:2rem;
-  }
-  .setup-card {
-    background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
-    padding:2.5rem; max-width:520px; width:100%;
-  }
-  .setup-logo { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; color:var(--accent); letter-spacing:2px; margin-bottom:0.3rem; }
-  .setup-sub { color:var(--text2); font-size:0.9rem; margin-bottom:2rem; }
-  .setup-card h2 { font-size:1.1rem; font-weight:500; margin-bottom:1.5rem; color:var(--text); }
-  .field { margin-bottom:1.2rem; }
-  .field label { display:block; font-size:0.82rem; color:var(--text2); margin-bottom:0.4rem; font-weight:500; }
-  .field input { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:0.65rem 0.9rem; color:var(--text); font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
-  .field input:focus { border-color:var(--accent); }
-  .btn-primary { background:var(--accent); color:#fff; border:none; padding:0.75rem 1.5rem; border-radius:var(--radius-sm); font-size:0.95rem; font-weight:600; cursor:pointer; width:100%; font-family:'DM Sans',sans-serif; transition:background 0.2s, transform 0.1s; }
-  .btn-primary:hover { background:var(--accent2); }
-  .btn-primary:active { transform:scale(0.98); }
-  .setup-note { font-size:0.78rem; color:var(--text3); margin-top:1.2rem; line-height:1.6; }
-  .setup-note a { color:var(--accent2); text-decoration:none; }
-  .setup-error { background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.3); border-radius:var(--radius-sm); padding:0.6rem 0.9rem; color:var(--accent2); font-size:0.85rem; margin-bottom:1rem; display:none; }
-
   /* MAIN APP */
-  #app { display:none; flex-direction:column; min-height:100vh; }
+  #app { display:flex; flex-direction:column; min-height:100vh; }
 
   /* NAVBAR */
   nav {
@@ -229,31 +206,6 @@
 </style>
 </head>
 <body>
-
-<!-- SETUP SCREEN -->
-<div id="setup-screen">
-  <div class="setup-card">
-    <div class="setup-logo">APILAGE TUBE</div>
-    <div class="setup-sub">Real-time video sharing platform</div>
-    <h2>Connect your Supabase database to get started</h2>
-    <div class="setup-error" id="setup-error"></div>
-    <div class="field">
-      <label>Supabase Project URL</label>
-      <input type="text" id="sb-url" placeholder="https://xxxxxxxxxxxx.supabase.co" />
-    </div>
-    <div class="field">
-      <label>Supabase Anon Key</label>
-      <input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
-    </div>
-    <button class="btn-primary" onclick="initSupabase()">Connect & Launch</button>
-    <p class="setup-note">
-      1. Go to <a href="https://supabase.com" target="_blank">supabase.com</a> → create a free project<br>
-      2. Project Settings → API → copy URL and anon key<br>
-      3. Run the SQL setup script (shown after connecting)<br><br>
-      Your credentials are only stored in your browser's localStorage.
-    </p>
-  </div>
-</div>
 
 <!-- MAIN APP -->
 <div id="app">
@@ -447,6 +399,13 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script>
+// ============================================================
+// HARDCODED SUPABASE CREDENTIALS - NO SETUP SCREEN NEEDED!
+// ============================================================
+const SUPABASE_URL = 'https://jgjttaalzpxhjxhtxkir.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanR0YWFsenB4aGp4aHR4a2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NjM5OTIsImV4cCI6MjA5MDMzOTk5Mn0.WCjIpGL_xXIWXKA8a-GLWCoYXqHjy1BSPhRKm_PxGiA';
+// ============================================================
+
 let sb = null;
 let currentUser = null;
 let currentVideo = null;
@@ -455,146 +414,23 @@ let currentCategory = 'all';
 let realtimeChannel = null;
 let selectedFile = null;
 
-// ─── SUPABASE INIT ───────────────────────────────────────────────────────────
-async function initSupabase() {
-  const url = document.getElementById('sb-url').value.trim();
-  const key = document.getElementById('sb-key').value.trim();
-  const errEl = document.getElementById('setup-error');
-  errEl.style.display = 'none';
-
-  if (!url || !key) { showSetupError('Please enter both URL and anon key.'); return; }
-  if (!url.startsWith('https://')) { showSetupError('URL must start with https://'); return; }
-
-  try {
-    sb = supabase.createClient(url, key);
-    const { error } = await sb.from('videos').select('id').limit(1);
-    if (error && error.code === '42P01') {
-      showSetupError('Table "videos" not found. Please run the SQL setup script. <a href="#" onclick="showSQLModal();return false;">Show SQL →</a>');
-      localStorage.setItem('sb_url', url);
-      localStorage.setItem('sb_key', key);
-      return;
-    }
-    if (error && error.message.includes('Invalid API key')) {
-      showSetupError('Invalid API key. Please check your anon key.'); return;
-    }
-    localStorage.setItem('sb_url', url);
-    localStorage.setItem('sb_key', key);
-    launchApp();
-  } catch(e) {
-    showSetupError('Connection failed: ' + e.message);
-  }
-}
-
-function showSetupError(msg) {
-  const el = document.getElementById('setup-error');
-  el.innerHTML = msg;
-  el.style.display = 'block';
-}
-
-function showSQLModal() {
-  const sql = `-- Run this in Supabase SQL Editor
--- Go to: Database → SQL Editor → New Query
-
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Users table (extends auth.users)
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  username TEXT NOT NULL,
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Videos table
-CREATE TABLE IF NOT EXISTS public.videos (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  category TEXT DEFAULT 'other',
-  video_url TEXT NOT NULL,
-  thumbnail_url TEXT,
-  views INTEGER DEFAULT 0,
-  likes INTEGER DEFAULT 0,
-  duration TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Comments table
-CREATE TABLE IF NOT EXISTS public.comments (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  video_id UUID REFERENCES public.videos(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT NOT NULL,
-  text TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Likes tracking
-CREATE TABLE IF NOT EXISTS public.video_likes (
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  video_id UUID REFERENCES public.videos(id) ON DELETE CASCADE,
-  PRIMARY KEY (user_id, video_id)
-);
-
--- Storage bucket (run after creating tables)
-INSERT INTO storage.buckets (id, name, public) VALUES ('videos', 'videos', true) ON CONFLICT DO NOTHING;
-
--- Storage policies
-CREATE POLICY "Public can read videos" ON storage.objects FOR SELECT USING (bucket_id = 'videos');
-CREATE POLICY "Auth users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'videos' AND auth.role() = 'authenticated');
-CREATE POLICY "Owner can delete" ON storage.objects FOR DELETE USING (bucket_id = 'videos' AND auth.uid()::text = (storage.foldername(name))[1]);
-
--- RLS
-ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.video_likes ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Public read videos" ON public.videos FOR SELECT USING (true);
-CREATE POLICY "Auth insert videos" ON public.videos FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Owner update videos" ON public.videos FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Owner delete videos" ON public.videos FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Public read comments" ON public.comments FOR SELECT USING (true);
-CREATE POLICY "Auth insert comments" ON public.comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Owner delete comments" ON public.comments FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "Public read profiles" ON public.profiles FOR SELECT USING (true);
-CREATE POLICY "Own profile" ON public.profiles FOR ALL USING (auth.uid() = id);
-
-CREATE POLICY "Auth read likes" ON public.video_likes FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Auth insert likes" ON public.video_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Auth delete likes" ON public.video_likes FOR DELETE USING (auth.uid() = user_id);
-
--- Enable realtime
-ALTER PUBLICATION supabase_realtime ADD TABLE public.videos;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.comments;`;
-
-  const win = window.open('', '_blank', 'width=700,height=600');
-  win.document.write(`<html><head><title>APILAGE TUBE - SQL Setup</title><style>body{background:#0a0a0a;color:#f0f0f0;font-family:monospace;padding:2rem;}pre{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:1.5rem;overflow-x:auto;font-size:0.82rem;line-height:1.6;}button{background:#ff4444;color:#fff;border:none;padding:0.5rem 1.2rem;border-radius:6px;cursor:pointer;font-size:0.9rem;margin-bottom:1rem;}h2{color:#ff4444;margin-bottom:0.5rem;}p{color:#aaa;margin-bottom:1rem;font-size:0.88rem;}</style></head><body><h2>APILAGE TUBE — Database Setup</h2><p>Copy and run this in Supabase: <strong>SQL Editor → New Query → paste → Run</strong></p><button onclick="navigator.clipboard.writeText(document.querySelector('pre').innerText).then(()=>this.textContent='Copied!')">Copy SQL</button><pre>${sql.replace(/</g,'&lt;')}</pre></body></html>`);
-}
-
-// ─── APP LAUNCH ──────────────────────────────────────────────────────────────
-async function launchApp() {
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
+// ─── SUPABASE INIT (DIRECT, NO SETUP) ───────────────────────────────────────
+(async function init() {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   document.getElementById('main-loader').style.display = 'flex';
-
+  
   const { data: { session } } = await sb.auth.getSession();
   if (session) await loadUser(session.user);
-
+  
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) await loadUser(session.user);
     if (event === 'SIGNED_OUT') { currentUser = null; updateAuthUI(); }
   });
-
+  
   await loadVideos();
   setupRealtime();
   setupDropZone();
-}
+})();
 
 async function loadUser(user) {
   currentUser = user;
@@ -732,21 +568,13 @@ async function openPlayer(v) {
   vid.src = v.video_url;
   vid.load();
 
-  // Show delete button if owner
   document.getElementById('delete-btn').style.display =
     (currentUser && currentUser.id === v.user_id) ? 'flex' : 'none';
 
-  // Check if liked
   await checkLiked();
-
-  // Increment view count
   await sb.from('videos').update({ views: (v.views || 0) + 1 }).eq('id', v.id);
   currentVideo.views = (v.views || 0) + 1;
-
-  // Load comments
   await loadComments(v.id);
-
-  // Load related videos
   loadRelated(v);
 }
 
@@ -789,7 +617,6 @@ async function toggleLike() {
 async function deleteVideo() {
   if (!currentVideo) return;
   if (!confirm('Delete this video? This cannot be undone.')) return;
-  // Delete from storage
   const urlParts = currentVideo.video_url.split('/storage/v1/object/public/videos/');
   if (urlParts.length > 1) {
     await sb.storage.from('videos').remove([urlParts[1]]);
@@ -828,7 +655,6 @@ async function loadComments(videoId) {
   const { data } = await sb.from('comments').select('*').eq('video_id', videoId).order('created_at', { ascending: false });
   renderComments(data || []);
 
-  // Realtime comments
   if (commentsRealtime) sb.removeChannel(commentsRealtime);
   commentsRealtime = sb.channel('comments-' + videoId)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments', filter: 'video_id=eq.' + videoId }, payload => {
@@ -922,11 +748,9 @@ function processVideoFile(file) {
   const vid = document.getElementById('preview-video');
   vid.src = url;
   preview.style.display = 'block';
-  // Auto-fill title from filename
   const nameWithoutExt = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ');
   if (!document.getElementById('upload-title').value)
     document.getElementById('upload-title').value = nameWithoutExt;
-  // Get duration
   vid.onloadedmetadata = () => {
     const dur = Math.floor(vid.duration);
     const m = Math.floor(dur/60), s = dur%60;
@@ -948,21 +772,14 @@ async function uploadVideo() {
   const ext = selectedFile.name.split('.').pop();
   const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
 
-  // Upload to storage
   const { data: storageData, error: storageErr } = await sb.storage.from('videos').upload(fileName, selectedFile, {
-    cacheControl: '3600', upsert: false,
-    onUploadProgress: (p) => {
-      const pct = Math.round((p.loaded / p.total) * 100);
-      document.getElementById('progress-bar').style.width = pct + '%';
-      document.getElementById('progress-text').textContent = `Uploading... ${pct}%`;
-    }
+    cacheControl: '3600', upsert: false
   });
 
   if (storageErr) { showToast('Upload failed: ' + storageErr.message, 'error'); btn.disabled = false; btn.textContent = 'Upload Video'; return; }
 
   const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(fileName);
 
-  // Save to DB
   const { error: dbErr } = await sb.from('videos').insert({
     user_id: currentUser.id,
     username: currentUser.profile?.username || currentUser.email,
@@ -1015,8 +832,8 @@ async function signUp() {
   if (data.user) {
     await sb.from('profiles').upsert({ id: data.user.id, username: name });
   }
-  showToast('Account created! Please check your email to confirm.', 'success');
-  closeAuth();
+  showToast('Account created! Please sign in.', 'success');
+  switchAuthTab('signin');
 }
 
 async function signOut() {
@@ -1051,12 +868,11 @@ function setCategory(cat, el) {
   loadVideos(cat);
 }
 
-function openTrending() {
-  sb.from('videos').select('*').order('views', { ascending: false }).limit(20).then(({ data }) => {
-    allVideos = data || [];
-    renderVideoGrid(allVideos);
-    document.getElementById('section-heading').textContent = '🔥 Trending';
-  });
+async function openTrending() {
+  const { data } = await sb.from('videos').select('*').order('views', { ascending: false }).limit(20);
+  allVideos = data || [];
+  renderVideoGrid(allVideos);
+  document.getElementById('section-heading').textContent = '🔥 Trending';
 }
 
 function filterMyVideos() {
@@ -1111,24 +927,9 @@ function showToast(msg, type = 'info') {
   setTimeout(() => t.remove(), 4000);
 }
 
-// ─── AUTO-INIT (if credentials saved) ────────────────────────────────────────
 window.addEventListener('click', e => {
   if (!e.target.closest('#user-menu')) document.getElementById('avatar-menu')?.classList.remove('open');
 });
-
-(async () => {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
-  if (url && key) {
-    document.getElementById('sb-url').value = url;
-    document.getElementById('sb-key').value = key;
-    sb = supabase.createClient(url, key);
-    try {
-      const { error } = await sb.from('videos').select('id').limit(1);
-      if (!error || error.code !== 'PGRST') { launchApp(); return; }
-    } catch(e) {}
-  }
-})();
 </script>
 </body>
 </html>

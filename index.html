@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APILAGE TUBE</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #1a1a1a;
+    --bg4: #222222;
+    --border: #2a2a2a;
+    --border2: #333333;
+    --text: #f0f0f0;
+    --text2: #aaaaaa;
+    --text3: #666666;
+    --accent: #ff4444;
+    --accent2: #ff6b6b;
+    --accent-dim: rgba(255,68,68,0.15);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; background:var(--bg); padding:2rem;
+  }
+  .setup-card {
+    background:var(--bg2); border:1px solid var(--border2); border-radius:16px;
+    padding:2.5rem; max-width:520px; width:100%;
+  }
+  .setup-logo { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; color:var(--accent); letter-spacing:2px; margin-bottom:0.3rem; }
+  .setup-sub { color:var(--text2); font-size:0.9rem; margin-bottom:2rem; }
+  .setup-card h2 { font-size:1.1rem; font-weight:500; margin-bottom:1.5rem; color:var(--text); }
+  .field { margin-bottom:1.2rem; }
+  .field label { display:block; font-size:0.82rem; color:var(--text2); margin-bottom:0.4rem; font-weight:500; }
+  .field input { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:0.65rem 0.9rem; color:var(--text); font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .field input:focus { border-color:var(--accent); }
+  .btn-primary { background:var(--accent); color:#fff; border:none; padding:0.75rem 1.5rem; border-radius:var(--radius-sm); font-size:0.95rem; font-weight:600; cursor:pointer; width:100%; font-family:'DM Sans',sans-serif; transition:background 0.2s, transform 0.1s; }
+  .btn-primary:hover { background:var(--accent2); }
+  .btn-primary:active { transform:scale(0.98); }
+  .setup-note { font-size:0.78rem; color:var(--text3); margin-top:1.2rem; line-height:1.6; }
+  .setup-note a { color:var(--accent2); text-decoration:none; }
+  .setup-error { background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.3); border-radius:var(--radius-sm); padding:0.6rem 0.9rem; color:var(--accent2); font-size:0.85rem; margin-bottom:1rem; display:none; }
+
+  /* MAIN APP */
+  #app { display:none; flex-direction:column; min-height:100vh; }
+
+  /* NAVBAR */
+  nav {
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; gap:1rem;
+    padding:0 1.5rem; height:58px;
+    background:rgba(10,10,10,0.95); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:var(--accent); letter-spacing:2px; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+  .nav-logo span { color:var(--text2); font-size:1rem; letter-spacing:0; font-family:'DM Sans',sans-serif; font-weight:300; margin-left:4px; }
+  .nav-search { flex:1; max-width:500px; position:relative; }
+  .nav-search input { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:50px; padding:0.5rem 1.1rem; color:var(--text); font-size:0.9rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .nav-search input:focus { border-color:var(--accent); }
+  .nav-actions { display:flex; align-items:center; gap:0.7rem; margin-left:auto; }
+  .btn-upload { background:var(--accent); color:#fff; border:none; padding:0.45rem 1rem; border-radius:50px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif; transition:background 0.2s; white-space:nowrap; }
+  .btn-upload:hover { background:var(--accent2); }
+  .btn-icon { background:var(--bg3); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text2); transition:background 0.2s, color 0.2s; flex-shrink:0; }
+  .btn-icon:hover { background:var(--bg4); color:var(--text); }
+  .avatar { width:34px; height:34px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.85rem; cursor:pointer; color:#fff; flex-shrink:0; position:relative; }
+  .avatar-menu { position:absolute; top:42px; right:0; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); padding:0.5rem; min-width:180px; z-index:200; display:none; }
+  .avatar-menu.open { display:block; }
+  .avatar-menu-item { padding:0.5rem 0.8rem; border-radius:var(--radius-sm); cursor:pointer; font-size:0.88rem; color:var(--text2); transition:background 0.15s, color 0.15s; }
+  .avatar-menu-item:hover { background:var(--bg3); color:var(--text); }
+  .avatar-menu-divider { border-top:1px solid var(--border); margin:0.4rem 0; }
+
+  /* CATEGORIES */
+  .categories { display:flex; gap:0.5rem; padding:0.8rem 1.5rem; overflow-x:auto; border-bottom:1px solid var(--border); background:var(--bg); }
+  .categories::-webkit-scrollbar { display:none; }
+  .cat-pill { background:var(--bg3); border:1px solid var(--border); border-radius:50px; padding:0.35rem 0.9rem; font-size:0.82rem; cursor:pointer; white-space:nowrap; color:var(--text2); transition:all 0.2s; flex-shrink:0; }
+  .cat-pill:hover { border-color:var(--border2); color:var(--text); }
+  .cat-pill.active { background:var(--text); color:#000; border-color:var(--text); font-weight:600; }
+
+  /* LAYOUT */
+  .main-content { display:flex; flex:1; }
+  .sidebar { width:220px; flex-shrink:0; padding:1rem 0; border-right:1px solid var(--border); background:var(--bg); position:sticky; top:58px; height:calc(100vh - 58px); overflow-y:auto; }
+  .sidebar::-webkit-scrollbar { width:4px; }
+  .sidebar::-webkit-scrollbar-track { background:transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+  .sidebar-item { display:flex; align-items:center; gap:0.75rem; padding:0.55rem 1.2rem; cursor:pointer; color:var(--text2); font-size:0.88rem; border-radius:var(--radius-sm); margin:0 0.5rem; transition:background 0.15s, color 0.15s; }
+  .sidebar-item:hover { background:var(--bg3); color:var(--text); }
+  .sidebar-item.active { background:var(--accent-dim); color:var(--accent); font-weight:500; }
+  .sidebar-icon { font-size:1.1rem; width:20px; text-align:center; }
+  .sidebar-divider { border-top:1px solid var(--border); margin:0.7rem 0; }
+  .sidebar-label { font-size:0.75rem; color:var(--text3); padding:0.3rem 1.2rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+  .content-area { flex:1; padding:1.5rem; overflow-y:auto; }
+
+  /* GRID */
+  .section-title { font-size:1.1rem; font-weight:600; margin-bottom:1rem; color:var(--text); }
+  .video-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.2rem; }
+  .video-card { background:var(--bg2); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:transform 0.2s, border-color 0.2s; border:1px solid var(--border); }
+  .video-card:hover { transform:translateY(-3px); border-color:var(--border2); }
+  .video-thumb { width:100%; aspect-ratio:16/9; background:var(--bg3); position:relative; overflow:hidden; }
+  .video-thumb video { width:100%; height:100%; object-fit:cover; }
+  .video-thumb-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; background:linear-gradient(135deg,var(--bg3),var(--bg4)); }
+  .thumb-duration { position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.85); border-radius:4px; padding:2px 5px; font-size:0.73rem; font-weight:600; }
+  .thumb-play { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0); transition:background 0.2s; }
+  .video-card:hover .thumb-play { background:rgba(0,0,0,0.3); }
+  .thumb-play-icon { width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s; }
+  .video-card:hover .thumb-play-icon { opacity:1; }
+  .video-info { padding:0.75rem; }
+  .video-title { font-size:0.9rem; font-weight:500; line-height:1.4; margin-bottom:0.35rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .video-meta { font-size:0.78rem; color:var(--text3); }
+  .video-author { color:var(--text2); font-weight:500; margin-bottom:0.15rem; }
+  .video-stats { display:flex; gap:0.5rem; }
+
+  /* UPLOAD MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:500; display:flex; align-items:center; justify-content:center; padding:1rem; display:none; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--bg2); border:1px solid var(--border2); border-radius:16px; width:100%; max-width:560px; padding:2rem; position:relative; max-height:90vh; overflow-y:auto; }
+  .modal h2 { font-size:1.2rem; font-weight:600; margin-bottom:1.5rem; }
+  .modal-close { position:absolute; top:1rem; right:1rem; background:var(--bg3); border:none; color:var(--text2); width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; }
+  .modal-close:hover { color:var(--text); }
+  .upload-drop { border:2px dashed var(--border2); border-radius:var(--radius); padding:2rem; text-align:center; cursor:pointer; transition:border-color 0.2s, background 0.2s; margin-bottom:1.2rem; }
+  .upload-drop:hover, .upload-drop.dragover { border-color:var(--accent); background:var(--accent-dim); }
+  .upload-icon { font-size:2.5rem; margin-bottom:0.5rem; }
+  .upload-drop p { color:var(--text2); font-size:0.9rem; }
+  .upload-drop input[type=file] { display:none; }
+  .upload-preview { width:100%; aspect-ratio:16/9; background:var(--bg3); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:1.2rem; display:none; }
+  .upload-preview video { width:100%; height:100%; }
+  .upload-progress { margin-bottom:1.2rem; display:none; }
+  .progress-bar-bg { background:var(--bg3); border-radius:50px; height:6px; overflow:hidden; }
+  .progress-bar { background:var(--accent); height:100%; border-radius:50px; transition:width 0.3s; width:0%; }
+  .progress-text { font-size:0.8rem; color:var(--text2); margin-top:0.4rem; }
+
+  /* VIDEO PLAYER MODAL */
+  .player-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:600; display:none; flex-direction:column; overflow-y:auto; }
+  .player-overlay.open { display:flex; }
+  .player-header { display:flex; align-items:center; padding:1rem 1.5rem; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .player-back { background:none; border:none; color:var(--text2); cursor:pointer; font-size:1.2rem; margin-right:1rem; padding:0.3rem; border-radius:50%; transition:background 0.2s; }
+  .player-back:hover { background:var(--bg3); color:var(--text); }
+  .player-title { font-size:1rem; font-weight:500; flex:1; }
+  .player-body { display:flex; gap:1.5rem; padding:1.5rem; flex:1; max-width:1400px; margin:0 auto; width:100%; }
+  .player-main { flex:1; min-width:0; }
+  .player-video-wrap { width:100%; aspect-ratio:16/9; background:#000; border-radius:var(--radius); overflow:hidden; margin-bottom:1rem; }
+  .player-video-wrap video { width:100%; height:100%; }
+  .player-video-title { font-size:1.2rem; font-weight:600; margin-bottom:0.5rem; }
+  .player-video-meta { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem; margin-bottom:1rem; }
+  .player-video-stats { color:var(--text2); font-size:0.85rem; }
+  .player-actions { display:flex; gap:0.6rem; }
+  .action-btn { background:var(--bg3); border:1px solid var(--border); border-radius:50px; padding:0.4rem 1rem; font-size:0.85rem; cursor:pointer; color:var(--text2); display:flex; align-items:center; gap:0.4rem; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
+  .action-btn:hover { background:var(--bg4); color:var(--text); border-color:var(--border2); }
+  .action-btn.liked { background:var(--accent-dim); color:var(--accent); border-color:rgba(255,68,68,0.3); }
+  .player-desc { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1.2rem; font-size:0.88rem; color:var(--text2); line-height:1.6; }
+  .player-channel { display:flex; align-items:center; gap:0.8rem; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:0.9rem; margin-bottom:1.2rem; }
+  .channel-avatar { width:42px; height:42px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:1rem; color:#fff; flex-shrink:0; }
+  .channel-info { flex:1; }
+  .channel-name { font-weight:500; font-size:0.95rem; }
+  .channel-sub { font-size:0.8rem; color:var(--text3); margin-top:2px; }
+  .comments-section { }
+  .comments-title { font-size:1rem; font-weight:600; margin-bottom:1rem; }
+  .comment-input-row { display:flex; gap:0.7rem; margin-bottom:1.2rem; }
+  .comment-input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:50px; padding:0.55rem 1rem; color:var(--text); font-size:0.88rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+  .comment-input:focus { border-color:var(--accent); }
+  .btn-comment { background:var(--accent); color:#fff; border:none; border-radius:50px; padding:0.55rem 1.2rem; cursor:pointer; font-size:0.85rem; font-weight:600; font-family:'DM Sans',sans-serif; }
+  .comment { display:flex; gap:0.7rem; margin-bottom:1rem; }
+  .comment-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg4); display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:600; flex-shrink:0; color:var(--text2); }
+  .comment-body { flex:1; }
+  .comment-author { font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:0.2rem; }
+  .comment-text { font-size:0.88rem; color:var(--text2); line-height:1.5; }
+  .comment-time { font-size:0.75rem; color:var(--text3); margin-top:0.2rem; }
+  .player-sidebar { width:340px; flex-shrink:0; }
+  .related-title { font-size:0.9rem; font-weight:600; margin-bottom:0.8rem; color:var(--text2); }
+  .related-card { display:flex; gap:0.7rem; cursor:pointer; padding:0.5rem; border-radius:var(--radius-sm); transition:background 0.15s; margin-bottom:0.3rem; }
+  .related-card:hover { background:var(--bg3); }
+  .related-thumb { width:130px; aspect-ratio:16/9; border-radius:6px; background:var(--bg3); flex-shrink:0; overflow:hidden; }
+  .related-thumb img, .related-thumb video { width:100%; height:100%; object-fit:cover; }
+  .related-info { flex:1; min-width:0; }
+  .related-video-title { font-size:0.83rem; font-weight:500; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:0.25rem; }
+  .related-meta { font-size:0.75rem; color:var(--text3); }
+
+  /* AUTH MODAL */
+  .auth-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:700; display:none; align-items:center; justify-content:center; padding:1rem; }
+  .auth-overlay.open { display:flex; }
+  .auth-card { background:var(--bg2); border:1px solid var(--border2); border-radius:16px; padding:2rem; max-width:420px; width:100%; position:relative; }
+  .auth-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; background:var(--bg3); border-radius:50px; padding:3px; }
+  .auth-tab { flex:1; padding:0.4rem; text-align:center; border-radius:50px; cursor:pointer; font-size:0.88rem; color:var(--text2); transition:all 0.2s; }
+  .auth-tab.active { background:var(--bg2); color:var(--text); font-weight:500; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+
+  /* NOTIFICATIONS */
+  .toast-container { position:fixed; bottom:1.5rem; right:1.5rem; z-index:1000; display:flex; flex-direction:column; gap:0.5rem; }
+  .toast { background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); padding:0.75rem 1.1rem; font-size:0.88rem; max-width:320px; animation:slideIn 0.3s ease; display:flex; align-items:center; gap:0.6rem; }
+  .toast.success { border-left:3px solid #4caf50; }
+  .toast.error { border-left:3px solid var(--accent); }
+  .toast.info { border-left:3px solid #2196f3; }
+  @keyframes slideIn { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:4rem 2rem; color:var(--text3); }
+  .empty-icon { font-size:3rem; margin-bottom:1rem; }
+  .empty-title { font-size:1.1rem; font-weight:500; color:var(--text2); margin-bottom:0.5rem; }
+  .empty-sub { font-size:0.88rem; }
+
+  /* LOADER */
+  .loader { display:flex; align-items:center; justify-content:center; padding:3rem; }
+  .spinner { width:36px; height:36px; border:3px solid var(--border2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* REALTIME BADGE */
+  .live-badge { background:var(--accent); color:#fff; font-size:0.7rem; font-weight:700; padding:2px 6px; border-radius:4px; margin-left:0.4rem; animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+  /* RESPONSIVE */
+  @media(max-width:900px) {
+    .sidebar { display:none; }
+    .player-body { flex-direction:column; }
+    .player-sidebar { width:100%; }
+    .video-grid { grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); }
+  }
+  @media(max-width:600px) {
+    nav { padding:0 0.8rem; gap:0.5rem; }
+    .nav-logo span { display:none; }
+    .content-area { padding:1rem; }
+    .categories { padding:0.6rem 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div class="setup-logo">APILAGE TUBE</div>
+    <div class="setup-sub">Real-time video sharing platform</div>
+    <h2>Connect your Supabase database to get started</h2>
+    <div class="setup-error" id="setup-error"></div>
+    <div class="field">
+      <label>Supabase Project URL</label>
+      <input type="text" id="sb-url" placeholder="https://xxxxxxxxxxxx.supabase.co" />
+    </div>
+    <div class="field">
+      <label>Supabase Anon Key</label>
+      <input type="text" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+    </div>
+    <button class="btn-primary" onclick="initSupabase()">Connect & Launch</button>
+    <p class="setup-note">
+      1. Go to <a href="https://supabase.com" target="_blank">supabase.com</a> → create a free project<br>
+      2. Project Settings → API → copy URL and anon key<br>
+      3. Run the SQL setup script (shown after connecting)<br><br>
+      Your credentials are only stored in your browser's localStorage.
+    </p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-logo" onclick="goHome()">APILAGE <span>TUBE</span></div>
+    <div class="nav-search">
+      <input type="text" id="search-input" placeholder="Search videos..." oninput="handleSearch(this.value)" />
+    </div>
+    <div class="nav-actions">
+      <button class="btn-upload" onclick="openUpload()">
+        <span>+</span> Upload
+      </button>
+      <div id="auth-btn" style="display:none">
+        <button class="btn-primary" style="padding:0.4rem 1rem;font-size:0.85rem;border-radius:50px;" onclick="openAuth()">Sign In</button>
+      </div>
+      <div id="user-menu" style="display:none;position:relative;">
+        <div class="avatar" id="user-avatar" onclick="toggleAvatarMenu()"></div>
+        <div class="avatar-menu" id="avatar-menu">
+          <div class="avatar-menu-item" id="menu-username" style="font-weight:600;color:var(--text);cursor:default;"></div>
+          <div class="avatar-menu-divider"></div>
+          <div class="avatar-menu-item" onclick="filterMyVideos()">My Videos</div>
+          <div class="avatar-menu-item" onclick="openAuth('profile')">Edit Profile</div>
+          <div class="avatar-menu-divider"></div>
+          <div class="avatar-menu-item" onclick="signOut()" style="color:var(--accent);">Sign Out</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CATEGORIES -->
+  <div class="categories" id="categories">
+    <div class="cat-pill active" onclick="setCategory('all',this)">All</div>
+    <div class="cat-pill" onclick="setCategory('music',this)">Music</div>
+    <div class="cat-pill" onclick="setCategory('gaming',this)">Gaming</div>
+    <div class="cat-pill" onclick="setCategory('tech',this)">Tech</div>
+    <div class="cat-pill" onclick="setCategory('education',this)">Education</div>
+    <div class="cat-pill" onclick="setCategory('sports',this)">Sports</div>
+    <div class="cat-pill" onclick="setCategory('vlogs',this)">Vlogs</div>
+    <div class="cat-pill" onclick="setCategory('comedy',this)">Comedy</div>
+    <div class="cat-pill" onclick="setCategory('news',this)">News</div>
+    <div class="cat-pill" onclick="setCategory('other',this)">Other</div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-content">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-item active" onclick="goHome()">
+        <span class="sidebar-icon">🏠</span> Home
+      </div>
+      <div class="sidebar-item" onclick="openTrending()">
+        <span class="sidebar-icon">🔥</span> Trending
+      </div>
+      <div class="sidebar-item" onclick="filterMyVideos()">
+        <span class="sidebar-icon">📺</span> My Videos
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Categories</div>
+      <div class="sidebar-item" onclick="setCategory('music',null)"><span class="sidebar-icon">🎵</span> Music</div>
+      <div class="sidebar-item" onclick="setCategory('gaming',null)"><span class="sidebar-icon">🎮</span> Gaming</div>
+      <div class="sidebar-item" onclick="setCategory('tech',null)"><span class="sidebar-icon">💻</span> Tech</div>
+      <div class="sidebar-item" onclick="setCategory('education',null)"><span class="sidebar-icon">📚</span> Education</div>
+      <div class="sidebar-item" onclick="setCategory('sports',null)"><span class="sidebar-icon">⚽</span> Sports</div>
+      <div class="sidebar-item" onclick="setCategory('vlogs',null)"><span class="sidebar-icon">📹</span> Vlogs</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-item" onclick="showAbout()"><span class="sidebar-icon">ℹ️</span> About</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-area">
+      <div id="home-section">
+        <div style="display:flex;align-items:center;margin-bottom:1rem;">
+          <span class="section-title" id="section-heading">All Videos</span>
+          <span class="live-badge">LIVE</span>
+        </div>
+        <div id="video-grid" class="video-grid"></div>
+        <div class="loader" id="main-loader"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeUpload()">✕</button>
+    <h2>Upload Video</h2>
+    <div class="upload-drop" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="upload-icon">🎬</div>
+      <p><strong>Click to select</strong> or drag & drop a video</p>
+      <p style="font-size:0.78rem;margin-top:0.3rem;">MP4, WebM, MOV — max 500MB</p>
+      <input type="file" id="file-input" accept="video/*" onchange="handleFileSelect(this)" />
+    </div>
+    <div class="upload-preview" id="upload-preview">
+      <video id="preview-video" controls></video>
+    </div>
+    <div class="field">
+      <label>Title *</label>
+      <input type="text" id="upload-title" placeholder="Give your video a catchy title..." maxlength="100" />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <input type="text" id="upload-desc" placeholder="Tell viewers what this video is about..." />
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="upload-cat" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:0.65rem 0.9rem;color:var(--text);font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+        <option value="other">Other</option>
+        <option value="music">Music</option>
+        <option value="gaming">Gaming</option>
+        <option value="tech">Tech</option>
+        <option value="education">Education</option>
+        <option value="sports">Sports</option>
+        <option value="vlogs">Vlogs</option>
+        <option value="comedy">Comedy</option>
+        <option value="news">News</option>
+      </select>
+    </div>
+    <div class="upload-progress" id="upload-progress">
+      <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="progress-text" id="progress-text">Uploading...</div>
+    </div>
+    <button class="btn-primary" id="upload-btn" onclick="uploadVideo()">Upload Video</button>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="auth-modal">
+  <div class="auth-card">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="nav-logo" style="margin-bottom:1.2rem;font-size:1.5rem;">APILAGE TUBE</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">Sign In</div>
+      <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+    </div>
+    <div class="setup-error" id="auth-error"></div>
+    <div id="auth-signin">
+      <div class="field"><label>Email</label><input type="email" id="signin-email" placeholder="you@example.com" /></div>
+      <div class="field"><label>Password</label><input type="password" id="signin-password" placeholder="••••••••" /></div>
+      <button class="btn-primary" onclick="signIn()">Sign In</button>
+    </div>
+    <div id="auth-signup" style="display:none;">
+      <div class="field"><label>Display Name</label><input type="text" id="signup-name" placeholder="Your name" /></div>
+      <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com" /></div>
+      <div class="field"><label>Password</label><input type="password" id="signup-password" placeholder="Min 6 characters" /></div>
+      <button class="btn-primary" onclick="signUp()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO PLAYER -->
+<div class="player-overlay" id="player-overlay">
+  <div class="player-header">
+    <button class="player-back" onclick="closePlayer()">←</button>
+    <div class="player-title" id="player-header-title"></div>
+  </div>
+  <div class="player-body">
+    <div class="player-main">
+      <div class="player-video-wrap">
+        <video id="player-video" controls autoplay style="width:100%;height:100%;"></video>
+      </div>
+      <div class="player-video-title" id="player-title"></div>
+      <div class="player-video-meta">
+        <div class="player-video-stats" id="player-stats"></div>
+        <div class="player-actions">
+          <button class="action-btn" id="like-btn" onclick="toggleLike()">👍 <span id="like-count">0</span></button>
+          <button class="action-btn" onclick="shareVideo()">🔗 Share</button>
+          <button class="action-btn" id="delete-btn" onclick="deleteVideo()" style="display:none;color:var(--accent);">🗑 Delete</button>
+        </div>
+      </div>
+      <div class="player-channel" id="player-channel"></div>
+      <div class="player-desc" id="player-desc"></div>
+      <div class="comments-section">
+        <div class="comments-title" id="comments-title">Comments</div>
+        <div class="comment-input-row">
+          <input type="text" class="comment-input" id="comment-input" placeholder="Add a comment..." onkeydown="if(event.key==='Enter')postComment()" />
+          <button class="btn-comment" onclick="postComment()">Post</button>
+        </div>
+        <div id="comments-list"></div>
+      </div>
+    </div>
+    <div class="player-sidebar">
+      <div class="related-title">Up Next</div>
+      <div id="related-videos"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+let sb = null;
+let currentUser = null;
+let currentVideo = null;
+let allVideos = [];
+let currentCategory = 'all';
+let realtimeChannel = null;
+let selectedFile = null;
+
+// ─── SUPABASE INIT ───────────────────────────────────────────────────────────
+async function initSupabase() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  const errEl = document.getElementById('setup-error');
+  errEl.style.display = 'none';
+
+  if (!url || !key) { showSetupError('Please enter both URL and anon key.'); return; }
+  if (!url.startsWith('https://')) { showSetupError('URL must start with https://'); return; }
+
+  try {
+    sb = supabase.createClient(url, key);
+    const { error } = await sb.from('videos').select('id').limit(1);
+    if (error && error.code === '42P01') {
+      showSetupError('Table "videos" not found. Please run the SQL setup script. <a href="#" onclick="showSQLModal();return false;">Show SQL →</a>');
+      localStorage.setItem('sb_url', url);
+      localStorage.setItem('sb_key', key);
+      return;
+    }
+    if (error && error.message.includes('Invalid API key')) {
+      showSetupError('Invalid API key. Please check your anon key.'); return;
+    }
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    launchApp();
+  } catch(e) {
+    showSetupError('Connection failed: ' + e.message);
+  }
+}
+
+function showSetupError(msg) {
+  const el = document.getElementById('setup-error');
+  el.innerHTML = msg;
+  el.style.display = 'block';
+}
+
+function showSQLModal() {
+  const sql = `-- Run this in Supabase SQL Editor
+-- Go to: Database → SQL Editor → New Query
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Users table (extends auth.users)
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  username TEXT NOT NULL,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Videos table
+CREATE TABLE IF NOT EXISTS public.videos (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT 'other',
+  video_url TEXT NOT NULL,
+  thumbnail_url TEXT,
+  views INTEGER DEFAULT 0,
+  likes INTEGER DEFAULT 0,
+  duration TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Comments table
+CREATE TABLE IF NOT EXISTS public.comments (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  video_id UUID REFERENCES public.videos(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT NOT NULL,
+  text TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Likes tracking
+CREATE TABLE IF NOT EXISTS public.video_likes (
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  video_id UUID REFERENCES public.videos(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, video_id)
+);
+
+-- Storage bucket (run after creating tables)
+INSERT INTO storage.buckets (id, name, public) VALUES ('videos', 'videos', true) ON CONFLICT DO NOTHING;
+
+-- Storage policies
+CREATE POLICY "Public can read videos" ON storage.objects FOR SELECT USING (bucket_id = 'videos');
+CREATE POLICY "Auth users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'videos' AND auth.role() = 'authenticated');
+CREATE POLICY "Owner can delete" ON storage.objects FOR DELETE USING (bucket_id = 'videos' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- RLS
+ALTER TABLE public.videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.video_likes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read videos" ON public.videos FOR SELECT USING (true);
+CREATE POLICY "Auth insert videos" ON public.videos FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Owner update videos" ON public.videos FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Owner delete videos" ON public.videos FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Public read comments" ON public.comments FOR SELECT USING (true);
+CREATE POLICY "Auth insert comments" ON public.comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Owner delete comments" ON public.comments FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Public read profiles" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Own profile" ON public.profiles FOR ALL USING (auth.uid() = id);
+
+CREATE POLICY "Auth read likes" ON public.video_likes FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Auth insert likes" ON public.video_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Auth delete likes" ON public.video_likes FOR DELETE USING (auth.uid() = user_id);
+
+-- Enable realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE public.videos;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.comments;`;
+
+  const win = window.open('', '_blank', 'width=700,height=600');
+  win.document.write(`<html><head><title>APILAGE TUBE - SQL Setup</title><style>body{background:#0a0a0a;color:#f0f0f0;font-family:monospace;padding:2rem;}pre{background:#1a1a1a;border:1px solid #333;border-radius:8px;padding:1.5rem;overflow-x:auto;font-size:0.82rem;line-height:1.6;}button{background:#ff4444;color:#fff;border:none;padding:0.5rem 1.2rem;border-radius:6px;cursor:pointer;font-size:0.9rem;margin-bottom:1rem;}h2{color:#ff4444;margin-bottom:0.5rem;}p{color:#aaa;margin-bottom:1rem;font-size:0.88rem;}</style></head><body><h2>APILAGE TUBE — Database Setup</h2><p>Copy and run this in Supabase: <strong>SQL Editor → New Query → paste → Run</strong></p><button onclick="navigator.clipboard.writeText(document.querySelector('pre').innerText).then(()=>this.textContent='Copied!')">Copy SQL</button><pre>${sql.replace(/</g,'&lt;')}</pre></body></html>`);
+}
+
+// ─── APP LAUNCH ──────────────────────────────────────────────────────────────
+async function launchApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('main-loader').style.display = 'flex';
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await loadUser(session.user);
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) await loadUser(session.user);
+    if (event === 'SIGNED_OUT') { currentUser = null; updateAuthUI(); }
+  });
+
+  await loadVideos();
+  setupRealtime();
+  setupDropZone();
+}
+
+async function loadUser(user) {
+  currentUser = user;
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  if (profile) currentUser.profile = profile;
+  else {
+    const name = user.email.split('@')[0];
+    await sb.from('profiles').upsert({ id: user.id, username: name });
+    currentUser.profile = { username: name };
+  }
+  updateAuthUI();
+  closeAuth();
+}
+
+function updateAuthUI() {
+  if (currentUser) {
+    document.getElementById('auth-btn').style.display = 'none';
+    document.getElementById('user-menu').style.display = 'block';
+    const name = currentUser.profile?.username || currentUser.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('menu-username').textContent = name;
+  } else {
+    document.getElementById('auth-btn').style.display = 'block';
+    document.getElementById('user-menu').style.display = 'none';
+  }
+}
+
+// ─── REALTIME ────────────────────────────────────────────────────────────────
+function setupRealtime() {
+  realtimeChannel = sb.channel('public-videos')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'videos' }, payload => {
+      const newVid = payload.new;
+      if (!allVideos.find(v => v.id === newVid.id)) {
+        allVideos.unshift(newVid);
+        if (currentCategory === 'all' || newVid.category === currentCategory) {
+          prependVideoCard(newVid);
+          showToast(`New video: "${newVid.title}" by ${newVid.username}`, 'info');
+        }
+      }
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'videos' }, payload => {
+      allVideos = allVideos.filter(v => v.id !== payload.old.id);
+      document.getElementById('vcard-' + payload.old.id)?.remove();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'videos' }, payload => {
+      const idx = allVideos.findIndex(v => v.id === payload.new.id);
+      if (idx !== -1) allVideos[idx] = payload.new;
+    })
+    .subscribe();
+}
+
+// ─── VIDEOS ──────────────────────────────────────────────────────────────────
+async function loadVideos(category = 'all', search = '') {
+  document.getElementById('main-loader').style.display = 'flex';
+  document.getElementById('video-grid').innerHTML = '';
+
+  let query = sb.from('videos').select('*').order('created_at', { ascending: false });
+  if (category !== 'all') query = query.eq('category', category);
+  if (search) query = query.ilike('title', `%${search}%`);
+
+  const { data, error } = await query;
+  document.getElementById('main-loader').style.display = 'none';
+
+  if (error) { showToast('Failed to load videos', 'error'); return; }
+  allVideos = data || [];
+  renderVideoGrid(allVideos);
+}
+
+function renderVideoGrid(videos) {
+  const grid = document.getElementById('video-grid');
+  grid.innerHTML = '';
+  if (!videos.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">🎬</div>
+      <div class="empty-title">No videos yet</div>
+      <div class="empty-sub">Be the first to upload a video!</div>
+    </div>`;
+    return;
+  }
+  videos.forEach(v => grid.appendChild(makeVideoCard(v)));
+}
+
+function prependVideoCard(v) {
+  const grid = document.getElementById('video-grid');
+  const emptyState = grid.querySelector('.empty-state');
+  if (emptyState) emptyState.remove();
+  grid.insertBefore(makeVideoCard(v), grid.firstChild);
+}
+
+function makeVideoCard(v) {
+  const el = document.createElement('div');
+  el.className = 'video-card';
+  el.id = 'vcard-' + v.id;
+  el.onclick = () => openPlayer(v);
+  const timeAgo = getTimeAgo(v.created_at);
+  el.innerHTML = `
+    <div class="video-thumb">
+      <div class="video-thumb-placeholder">🎬</div>
+      <div class="thumb-play"><div class="thumb-play-icon">▶</div></div>
+      ${v.duration ? `<div class="thumb-duration">${v.duration}</div>` : ''}
+    </div>
+    <div class="video-info">
+      <div class="video-title">${escHtml(v.title)}</div>
+      <div class="video-meta">
+        <div class="video-author">${escHtml(v.username)}</div>
+        <div class="video-stats">
+          <span>${formatViews(v.views)} views</span>
+          <span>•</span>
+          <span>${timeAgo}</span>
+          <span>•</span>
+          <span>${v.category}</span>
+        </div>
+      </div>
+    </div>`;
+  return el;
+}
+
+// ─── PLAYER ──────────────────────────────────────────────────────────────────
+async function openPlayer(v) {
+  currentVideo = v;
+  document.getElementById('player-overlay').classList.add('open');
+  document.getElementById('player-header-title').textContent = v.title;
+  document.getElementById('player-title').textContent = v.title;
+  document.getElementById('player-stats').textContent = `${formatViews(v.views)} views • ${getTimeAgo(v.created_at)} • ${v.category}`;
+  document.getElementById('like-count').textContent = v.likes || 0;
+  document.getElementById('player-desc').textContent = v.description || 'No description';
+  document.getElementById('player-channel').innerHTML = `
+    <div class="channel-avatar">${v.username.charAt(0).toUpperCase()}</div>
+    <div class="channel-info">
+      <div class="channel-name">${escHtml(v.username)}</div>
+      <div class="channel-sub">Uploaded ${getTimeAgo(v.created_at)}</div>
+    </div>`;
+
+  const vid = document.getElementById('player-video');
+  vid.src = v.video_url;
+  vid.load();
+
+  // Show delete button if owner
+  document.getElementById('delete-btn').style.display =
+    (currentUser && currentUser.id === v.user_id) ? 'flex' : 'none';
+
+  // Check if liked
+  await checkLiked();
+
+  // Increment view count
+  await sb.from('videos').update({ views: (v.views || 0) + 1 }).eq('id', v.id);
+  currentVideo.views = (v.views || 0) + 1;
+
+  // Load comments
+  await loadComments(v.id);
+
+  // Load related videos
+  loadRelated(v);
+}
+
+function closePlayer() {
+  document.getElementById('player-overlay').classList.remove('open');
+  document.getElementById('player-video').pause();
+  document.getElementById('player-video').src = '';
+  currentVideo = null;
+}
+
+async function checkLiked() {
+  if (!currentUser || !currentVideo) return;
+  const { data } = await sb.from('video_likes').select('*').eq('user_id', currentUser.id).eq('video_id', currentVideo.id).single();
+  const btn = document.getElementById('like-btn');
+  if (data) btn.classList.add('liked');
+  else btn.classList.remove('liked');
+}
+
+async function toggleLike() {
+  if (!currentUser) { openAuth(); return; }
+  const btn = document.getElementById('like-btn');
+  const liked = btn.classList.contains('liked');
+
+  if (liked) {
+    await sb.from('video_likes').delete().eq('user_id', currentUser.id).eq('video_id', currentVideo.id);
+    const newLikes = Math.max(0, (currentVideo.likes || 0) - 1);
+    await sb.from('videos').update({ likes: newLikes }).eq('id', currentVideo.id);
+    currentVideo.likes = newLikes;
+    btn.classList.remove('liked');
+  } else {
+    await sb.from('video_likes').insert({ user_id: currentUser.id, video_id: currentVideo.id });
+    const newLikes = (currentVideo.likes || 0) + 1;
+    await sb.from('videos').update({ likes: newLikes }).eq('id', currentVideo.id);
+    currentVideo.likes = newLikes;
+    btn.classList.add('liked');
+  }
+  document.getElementById('like-count').textContent = currentVideo.likes;
+}
+
+async function deleteVideo() {
+  if (!currentVideo) return;
+  if (!confirm('Delete this video? This cannot be undone.')) return;
+  // Delete from storage
+  const urlParts = currentVideo.video_url.split('/storage/v1/object/public/videos/');
+  if (urlParts.length > 1) {
+    await sb.storage.from('videos').remove([urlParts[1]]);
+  }
+  await sb.from('videos').delete().eq('id', currentVideo.id);
+  closePlayer();
+  showToast('Video deleted', 'success');
+}
+
+function shareVideo() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(window.location.href + '#video=' + currentVideo.id);
+    showToast('Link copied to clipboard!', 'success');
+  } else {
+    showToast('Video ID: ' + currentVideo.id, 'info');
+  }
+}
+
+function loadRelated(v) {
+  const related = allVideos.filter(vid => vid.id !== v.id).slice(0, 8);
+  const cont = document.getElementById('related-videos');
+  cont.innerHTML = related.map(rv => `
+    <div class="related-card" onclick="openPlayer(${JSON.stringify(rv).replace(/"/g,'&quot;')})">
+      <div class="related-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:var(--bg3);">🎬</div>
+      <div class="related-info">
+        <div class="related-video-title">${escHtml(rv.title)}</div>
+        <div class="related-meta">${escHtml(rv.username)} • ${formatViews(rv.views)} views</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── COMMENTS ────────────────────────────────────────────────────────────────
+let commentsRealtime = null;
+
+async function loadComments(videoId) {
+  const { data } = await sb.from('comments').select('*').eq('video_id', videoId).order('created_at', { ascending: false });
+  renderComments(data || []);
+
+  // Realtime comments
+  if (commentsRealtime) sb.removeChannel(commentsRealtime);
+  commentsRealtime = sb.channel('comments-' + videoId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments', filter: 'video_id=eq.' + videoId }, payload => {
+      const list = document.getElementById('comments-list');
+      list.insertBefore(makeCommentEl(payload.new), list.firstChild);
+      const title = document.getElementById('comments-title');
+      const count = list.querySelectorAll('.comment').length;
+      title.textContent = `Comments (${count})`;
+    })
+    .subscribe();
+}
+
+function renderComments(comments) {
+  const list = document.getElementById('comments-list');
+  document.getElementById('comments-title').textContent = `Comments (${comments.length})`;
+  list.innerHTML = comments.map(c => makeCommentEl(c).outerHTML).join('');
+}
+
+function makeCommentEl(c) {
+  const div = document.createElement('div');
+  div.className = 'comment';
+  div.innerHTML = `
+    <div class="comment-avatar">${c.username.charAt(0).toUpperCase()}</div>
+    <div class="comment-body">
+      <div class="comment-author">${escHtml(c.username)}</div>
+      <div class="comment-text">${escHtml(c.text)}</div>
+      <div class="comment-time">${getTimeAgo(c.created_at)}</div>
+    </div>`;
+  return div;
+}
+
+async function postComment() {
+  if (!currentUser) { openAuth(); return; }
+  const input = document.getElementById('comment-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const { error } = await sb.from('comments').insert({
+    video_id: currentVideo.id,
+    user_id: currentUser.id,
+    username: currentUser.profile?.username || currentUser.email,
+    text
+  });
+  if (error) showToast('Failed to post comment', 'error');
+}
+
+// ─── UPLOAD ──────────────────────────────────────────────────────────────────
+function openUpload() {
+  if (!currentUser) { openAuth(); return; }
+  document.getElementById('upload-modal').classList.add('open');
+}
+
+function closeUpload() {
+  document.getElementById('upload-modal').classList.remove('open');
+  resetUploadForm();
+}
+
+function resetUploadForm() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-title').value = '';
+  document.getElementById('upload-desc').value = '';
+  document.getElementById('upload-progress').style.display = 'none';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('upload-btn').disabled = false;
+  document.getElementById('upload-btn').textContent = 'Upload Video';
+}
+
+function setupDropZone() {
+  const zone = document.getElementById('drop-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('video/')) processVideoFile(file);
+    else showToast('Please drop a video file', 'error');
+  });
+}
+
+function handleFileSelect(input) {
+  if (input.files[0]) processVideoFile(input.files[0]);
+}
+
+function processVideoFile(file) {
+  selectedFile = file;
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById('upload-preview');
+  const vid = document.getElementById('preview-video');
+  vid.src = url;
+  preview.style.display = 'block';
+  // Auto-fill title from filename
+  const nameWithoutExt = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g,' ');
+  if (!document.getElementById('upload-title').value)
+    document.getElementById('upload-title').value = nameWithoutExt;
+  // Get duration
+  vid.onloadedmetadata = () => {
+    const dur = Math.floor(vid.duration);
+    const m = Math.floor(dur/60), s = dur%60;
+    selectedFile._duration = `${m}:${String(s).padStart(2,'0')}`;
+  };
+}
+
+async function uploadVideo() {
+  if (!selectedFile) { showToast('Please select a video file', 'error'); return; }
+  const title = document.getElementById('upload-title').value.trim();
+  if (!title) { showToast('Please enter a title', 'error'); return; }
+  if (selectedFile.size > 500 * 1024 * 1024) { showToast('File too large (max 500MB)', 'error'); return; }
+
+  const btn = document.getElementById('upload-btn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+  document.getElementById('upload-progress').style.display = 'block';
+
+  const ext = selectedFile.name.split('.').pop();
+  const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
+
+  // Upload to storage
+  const { data: storageData, error: storageErr } = await sb.storage.from('videos').upload(fileName, selectedFile, {
+    cacheControl: '3600', upsert: false,
+    onUploadProgress: (p) => {
+      const pct = Math.round((p.loaded / p.total) * 100);
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = `Uploading... ${pct}%`;
+    }
+  });
+
+  if (storageErr) { showToast('Upload failed: ' + storageErr.message, 'error'); btn.disabled = false; btn.textContent = 'Upload Video'; return; }
+
+  const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(fileName);
+
+  // Save to DB
+  const { error: dbErr } = await sb.from('videos').insert({
+    user_id: currentUser.id,
+    username: currentUser.profile?.username || currentUser.email,
+    title,
+    description: document.getElementById('upload-desc').value,
+    category: document.getElementById('upload-cat').value,
+    video_url: publicUrl,
+    duration: selectedFile._duration || null,
+    views: 0,
+    likes: 0
+  });
+
+  if (dbErr) { showToast('Failed to save video: ' + dbErr.message, 'error'); return; }
+
+  showToast('Video uploaded successfully!', 'success');
+  closeUpload();
+  loadVideos(currentCategory);
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+function openAuth(tab) {
+  document.getElementById('auth-modal').classList.add('open');
+  if (tab) switchAuthTab(tab);
+}
+function closeAuth() { document.getElementById('auth-modal').classList.remove('open'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('auth-signin').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('auth-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+async function signIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const pass = document.getElementById('signin-password').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { document.getElementById('auth-error').textContent = error.message; document.getElementById('auth-error').style.display = 'block'; }
+  else showToast('Welcome back!', 'success');
+}
+
+async function signUp() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-password').value;
+  if (!name) { document.getElementById('auth-error').textContent = 'Name is required'; document.getElementById('auth-error').style.display = 'block'; return; }
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+  if (error) { document.getElementById('auth-error').textContent = error.message; document.getElementById('auth-error').style.display = 'block'; return; }
+  if (data.user) {
+    await sb.from('profiles').upsert({ id: data.user.id, username: name });
+  }
+  showToast('Account created! Please check your email to confirm.', 'success');
+  closeAuth();
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  currentUser = null;
+  updateAuthUI();
+  toggleAvatarMenu();
+  showToast('Signed out', 'info');
+}
+
+function toggleAvatarMenu() {
+  document.getElementById('avatar-menu').classList.toggle('open');
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function goHome() {
+  currentCategory = 'all';
+  document.getElementById('search-input').value = '';
+  document.getElementById('section-heading').textContent = 'All Videos';
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  document.querySelector('.cat-pill').classList.add('active');
+  loadVideos('all');
+}
+
+function setCategory(cat, el) {
+  currentCategory = cat;
+  document.getElementById('section-heading').textContent = cat === 'all' ? 'All Videos' : cat.charAt(0).toUpperCase() + cat.slice(1);
+  if (el) {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+  loadVideos(cat);
+}
+
+function openTrending() {
+  sb.from('videos').select('*').order('views', { ascending: false }).limit(20).then(({ data }) => {
+    allVideos = data || [];
+    renderVideoGrid(allVideos);
+    document.getElementById('section-heading').textContent = '🔥 Trending';
+  });
+}
+
+function filterMyVideos() {
+  if (!currentUser) { openAuth(); return; }
+  toggleAvatarMenu();
+  const mine = allVideos.filter(v => v.user_id === currentUser.id);
+  renderVideoGrid(mine);
+  document.getElementById('section-heading').textContent = 'My Videos';
+}
+
+let searchTimer;
+function handleSearch(val) {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadVideos(currentCategory, val), 400);
+}
+
+function showAbout() {
+  showToast('APILAGE TUBE — Real-time video sharing platform powered by Supabase', 'info');
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatViews(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function getTimeAgo(ts) {
+  if (!ts) return '';
+  const s = Math.floor((Date.now() - new Date(ts)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  if (s < 604800) return Math.floor(s/86400) + 'd ago';
+  if (s < 2592000) return Math.floor(s/604800) + 'w ago';
+  return Math.floor(s/2592000) + 'mo ago';
+}
+
+function showToast(msg, type = 'info') {
+  const cont = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  t.innerHTML = `<span style="font-size:1rem">${icons[type]||'ℹ'}</span> ${escHtml(msg)}`;
+  cont.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+// ─── AUTO-INIT (if credentials saved) ────────────────────────────────────────
+window.addEventListener('click', e => {
+  if (!e.target.closest('#user-menu')) document.getElementById('avatar-menu')?.classList.remove('open');
+});
+
+(async () => {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) {
+    document.getElementById('sb-url').value = url;
+    document.getElementById('sb-key').value = key;
+    sb = supabase.createClient(url, key);
+    try {
+      const { error } = await sb.from('videos').select('id').limit(1);
+      if (!error || error.code !== 'PGRST') { launchApp(); return; }
+    } catch(e) {}
+  }
+})();
+</script>
+</body>
+</html>

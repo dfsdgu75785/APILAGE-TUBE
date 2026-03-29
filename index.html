@@ -3,126 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APILAGE TUBE 3.0 - Real-time Video Platform</title>
+  <title>APILAGE TUBE - Real-time Video Platform</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    :root {
-      --bg: #0f0f0f;
-      --bg2: #1a1a1a;
-      --bg3: #222222;
-      --bg4: #2a2a2a;
-      --border: #2a2a2a;
-      --border2: #3a3a3a;
-      --text: #ffffff;
-      --text2: #aaaaaa;
-      --text3: #777777;
-      --accent: #ff4444;
-      --accent2: #ff6666;
-      --blue: #3ea6ff;
-      --red: #cc0000;
-    }
-    
     body {
       font-family: 'Roboto', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
+      background: #0f0f0f;
+      color: #ffffff;
     }
-    
     /* Navbar */
     .navbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      height: 56px;
+      background: #0f0f0f;
+      border-bottom: 1px solid #2a2a2a;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1.5rem;
-      height: 56px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      z-index: 100;
     }
-    
-    .nav-left { display: flex; align-items: center; gap: 1rem; }
-    .menu-btn { background: none; border: none; color: var(--text); font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; }
-    .logo { font-size: 1.3rem; font-weight: 700; cursor: pointer; }
-    .logo span { color: var(--accent); }
-    
-    .nav-center { flex: 1; max-width: 600px; margin: 0 2rem; }
-    .search-container { display: flex; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 40px; overflow: hidden; }
-    .search-container input { flex: 1; background: none; border: none; padding: 0.6rem 1rem; color: var(--text); font-size: 0.9rem; outline: none; }
-    .search-container button { background: var(--bg3); border: none; padding: 0.6rem 1.2rem; color: var(--text2); cursor: pointer; }
-    
-    .nav-right { display: flex; align-items: center; gap: 0.8rem; }
-    .upload-btn { background: var(--bg3); border: none; padding: 0.5rem 1rem; border-radius: 40px; color: var(--text); font-size: 0.85rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
-    .upload-btn:hover { background: var(--bg4); }
-    
-    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; cursor: pointer; object-fit: cover; }
-    .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .logo span { color: #ff4444; }
+    .search-bar {
+      flex: 1;
+      max-width: 600px;
+      margin: 0 20px;
+      display: flex;
+    }
+    .search-bar input {
+      flex: 1;
+      background: #121212;
+      border: 1px solid #2a2a2a;
+      border-radius: 40px 0 0 40px;
+      padding: 8px 16px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-bar button {
+      background: #2a2a2a;
+      border: 1px solid #2a2a2a;
+      border-left: none;
+      border-radius: 0 40px 40px 0;
+      padding: 8px 20px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .btn-upload, .btn-signin {
+      background: #2a2a2a;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 40px;
+      color: white;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .btn-upload { background: #ff4444; }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ff4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 8px;
+    }
     /* Sidebar */
     .sidebar {
       position: fixed;
-      left: 0;
       top: 56px;
-      width: 240px;
+      left: 0;
+      width: 220px;
       height: calc(100vh - 56px);
-      background: var(--bg);
+      background: #0f0f0f;
       overflow-y: auto;
-      padding: 0.8rem 0;
-      z-index: 90;
+      padding: 12px 0;
     }
-    
     .sidebar-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 0.6rem 1.2rem;
+      gap: 16px;
+      padding: 8px 24px;
       cursor: pointer;
-      color: var(--text2);
+      color: #aaa;
       border-radius: 10px;
-      margin: 0 0.5rem;
-      transition: all 0.2s;
+      margin: 0 8px;
     }
-    .sidebar-item:hover { background: var(--bg3); color: var(--text); }
-    .sidebar-item.active { background: var(--bg3); color: var(--text); }
+    .sidebar-item:hover { background: #272727; color: white; }
     .sidebar-item i { width: 22px; }
-    .sidebar-divider { height: 1px; background: var(--border); margin: 0.8rem 1rem; }
-    .sidebar-label { font-size: 0.7rem; color: var(--text3); padding: 0.5rem 1.2rem; }
-    
+    .sidebar-divider { height: 1px; background: #2a2a2a; margin: 12px 16px; }
+    .sidebar-label { font-size: 12px; color: #777; padding: 8px 24px; }
     /* Main Content */
     .main-content {
-      margin-left: 240px;
+      margin-left: 220px;
       margin-top: 56px;
-      padding: 1.5rem;
+      padding: 20px;
       min-height: calc(100vh - 56px);
     }
-    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .live-badge {
+      background: #ff4444;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 10px;
+    }
     /* Video Grid */
     .video-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
-    
-    .video-card { cursor: pointer; transition: transform 0.2s; }
+    .video-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
     .video-card:hover { transform: translateY(-2px); }
-    
     .thumbnail {
       width: 100%;
       aspect-ratio: 16/9;
-      background: var(--bg3);
+      background: #1a1a1a;
       border-radius: 12px;
       overflow: hidden;
       position: relative;
     }
-    .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
     .duration {
       position: absolute;
       bottom: 8px;
@@ -130,153 +161,160 @@
       background: rgba(0,0,0,0.8);
       border-radius: 4px;
       padding: 2px 5px;
-      font-size: 0.7rem;
+      font-size: 11px;
     }
-    
-    .video-info { display: flex; gap: 0.8rem; margin-top: 0.8rem; }
-    .channel-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-    .channel-icon img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .video-details h3 { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.3rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .video-details p { font-size: 0.75rem; color: var(--text2); margin-bottom: 0.2rem; }
-    
-    /* Channel Page */
-    .channel-banner {
-      width: 100%;
-      height: 180px;
-      background: linear-gradient(135deg, var(--accent), var(--bg3));
-      border-radius: 16px;
-      margin-bottom: 1.5rem;
-      object-fit: cover;
-    }
-    .channel-header {
+    .video-info {
       display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      gap: 12px;
+      margin-top: 12px;
     }
-    .channel-avatar-lg {
-      width: 80px;
-      height: 80px;
+    .channel-icon {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: var(--accent);
+      background: #2a2a2a;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      flex-shrink: 0;
     }
-    .channel-avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
-    .channel-stats h2 { font-size: 1.5rem; margin-bottom: 0.3rem; }
-    .channel-stats p { color: var(--text2); }
-    
-    /* Player Modal */
-    .player-overlay {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 200;
-      display: none;
-      overflow-y: auto;
+    .video-details h3 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    .player-overlay.open { display: block; }
-    .player-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; }
-    .player-main { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
-    .video-player { width: 100%; border-radius: 12px; overflow: hidden; }
-    .video-player video { width: 100%; aspect-ratio: 16/9; background: #000; }
-    .video-title { font-size: 1.2rem; font-weight: 600; margin: 0.8rem 0 0.5rem; }
-    
-    .video-actions { display: flex; align-items: center; justify-content: space-between; margin: 0.8rem 0; flex-wrap: wrap; gap: 1rem; }
-    .action-buttons { display: flex; gap: 1rem; }
-    .action-btn { background: none; border: none; color: var(--text2); padding: 0.5rem 0.8rem; border-radius: 40px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
-    .action-btn:hover { background: var(--bg3); color: var(--text); }
-    .action-btn.liked { color: var(--blue); }
-    .action-btn.disliked { color: var(--red); }
-    
-    .channel-section {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 1rem 0;
-      padding: 1rem 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+    .video-details p {
+      font-size: 12px;
+      color: #aaa;
     }
-    .channel-left { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
-    .channel-avatar-md { width: 48px; height: 48px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .channel-avatar-md img { width: 100%; height: 100%; object-fit: cover; }
-    .channel-info h4 { font-size: 1rem; margin-bottom: 0.2rem; }
-    .channel-info p { font-size: 0.75rem; color: var(--text2); }
-    
-    .subscribe-btn { background: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; }
-    .subscribe-btn.subscribed { background: var(--bg3); color: var(--text2); }
-    
-    .description { background: var(--bg2); padding: 1rem; border-radius: 12px; margin: 1rem 0; font-size: 0.85rem; line-height: 1.5; }
-    .comments-section { margin-top: 1.5rem; }
-    .comment-input { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
-    .comment-input input { flex: 1; background: none; border: none; border-bottom: 1px solid var(--border); padding: 0.5rem; color: var(--text); outline: none; }
-    .comment { display: flex; gap: 1rem; margin-bottom: 1rem; }
-    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .comment-content { flex: 1; }
-    .comment-author { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.2rem; }
-    .comment-text { font-size: 0.85rem; margin-bottom: 0.2rem; }
-    .comment-time { font-size: 0.7rem; color: var(--text3); }
-    
-    .related-card { display: flex; gap: 0.8rem; margin-bottom: 1rem; cursor: pointer; }
-    .related-thumb { width: 160px; aspect-ratio: 16/9; background: var(--bg3); border-radius: 8px; overflow: hidden; }
-    .related-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .related-info h4 { font-size: 0.85rem; margin-bottom: 0.3rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .related-info p { font-size: 0.7rem; color: var(--text2); }
-    
     /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.9);
-      z-index: 300;
+      z-index: 200;
       display: none;
       align-items: center;
       justify-content: center;
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: var(--bg2);
+      background: #1a1a1a;
       border-radius: 16px;
-      padding: 2rem;
+      padding: 24px;
       width: 100%;
       max-width: 500px;
-      border: 1px solid var(--border);
+      border: 1px solid #2a2a2a;
     }
-    .modal h2 { margin-bottom: 1.5rem; }
-    .field { margin-bottom: 1rem; }
-    .field label { display: block; font-size: 0.8rem; color: var(--text2); margin-bottom: 0.3rem; }
-    .field input, .field select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem; color: var(--text); }
-    .btn-primary { background: var(--accent); color: white; border: none; padding: 0.7rem; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; }
-    .btn-secondary { background: var(--bg3); color: var(--text); border: none; padding: 0.7rem; border-radius: 40px; cursor: pointer; width: 100%; margin-top: 0.5rem; }
-    .auth-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
-    .auth-tab { flex: 1; text-align: center; padding: 0.5rem; cursor: pointer; border-radius: 40px; background: var(--bg3); color: var(--text2); }
-    .auth-tab.active { background: var(--accent); color: white; }
-    .error-text { color: var(--accent); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; }
-    
+    .modal h2 { margin-bottom: 20px; }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 10px;
+      color: white;
+    }
+    .btn-primary {
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-secondary {
+      background: #2a2a2a;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 40px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 40px;
+      background: #2a2a2a;
+      color: #aaa;
+    }
+    .auth-tab.active {
+      background: #ff4444;
+      color: white;
+    }
+    .player-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0f0f0f;
+      z-index: 300;
+      display: none;
+      overflow-y: auto;
+    }
+    .player-overlay.open { display: block; }
+    .player-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .video-player video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: black;
+      border-radius: 12px;
+    }
     .toast-container {
       position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      bottom: 20px;
+      right: 20px;
+      z-index: 400;
     }
-    .toast { background: var(--bg2); border-left: 3px solid var(--accent); padding: 0.7rem 1rem; border-radius: 8px; animation: slideIn 0.2s ease; }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .loader { display: flex; justify-content: center; padding: 2rem; }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .toast {
+      background: #1a1a1a;
+      border-left: 3px solid #ff4444;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .loader {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #2a2a2a;
+      border-top-color: #ff4444;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
     @media (max-width: 768px) {
-      .sidebar { transform: translateX(-240px); }
+      .sidebar { transform: translateX(-220px); }
       .main-content { margin-left: 0; }
-      .player-main { grid-template-columns: 1fr; }
-      .video-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -287,7 +325,7 @@
 
 <script>
 // ============================================================
-// SUPABASE CREDENTIALS - YOUR DATABASE
+// YOUR SUPABASE CREDENTIALS - HARDCODED
 // ============================================================
 const SUPABASE_URL = 'https://jgjttaalzpxhjxhtxkir.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanR0YWFsenB4aGp4aHR4a2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NjM5OTIsImV4cCI6MjA5MDMzOTk5Mn0.WCjIpGL_xXIWXKA8a-GLWCoYXqHjy1BSPhRKm_PxGiA';
@@ -297,220 +335,144 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let allVideos = [];
 let currentCategory = 'all';
-let currentSearch = '';
-let currentChannelView = null;
 
 function showToast(msg, type = 'info') {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${msg}`;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  setTimeout(() => toast.remove(), 3000);
 }
 
-function escHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-function formatViews(n) { if (!n) return '0'; if (n >= 1000000) return (n/1000000).toFixed(1) + 'M'; if (n >= 1000) return (n/1000).toFixed(1) + 'K'; return String(n); }
-function getTimeAgo(ts) { if (!ts) return ''; const seconds = Math.floor((Date.now() - new Date(ts)) / 1000); if (seconds < 60) return 'just now'; if (seconds < 3600) return Math.floor(seconds/60) + 'm ago'; if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago'; if (seconds < 604800) return Math.floor(seconds/86400) + 'd ago'; return Math.floor(seconds/604800) + 'w ago'; }
+function formatViews(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+  return String(n);
+}
 
+function getTimeAgo(ts) {
+  if (!ts) return '';
+  const seconds = Math.floor((Date.now() - new Date(ts)) / 1000);
+  if (seconds < 60) return 'just now';
+  if (seconds < 3600) return Math.floor(seconds/60) + 'm ago';
+  if (seconds < 86400) return Math.floor(seconds/3600) + 'h ago';
+  return Math.floor(seconds/86400) + 'd ago';
+}
+
+// Load videos from database
 async function loadVideos() {
   const grid = document.getElementById('videoGrid');
   const loader = document.getElementById('loader');
   if (loader) loader.style.display = 'flex';
   
-  let query = sb.from('videos').select('*, profiles:user_id(username, avatar_url)').order('created_at', { ascending: false });
+  let query = sb.from('videos').select('*').order('created_at', { ascending: false });
   if (currentCategory !== 'all') query = query.eq('category', currentCategory);
-  if (currentSearch) query = query.ilike('title', `%${currentSearch}%`);
   
   const { data, error } = await query;
   if (loader) loader.style.display = 'none';
-  if (error) { showToast('Error loading videos', 'error'); return; }
+  
+  if (error) {
+    showToast('Error loading videos: ' + error.message, 'error');
+    console.error('Load error:', error);
+    return;
+  }
   
   allVideos = data || [];
+  console.log('Loaded videos:', allVideos.length);
+  
   if (!grid) return;
   
   if (allVideos.length === 0) {
-    grid.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3)"><i class="fas fa-video" style="font-size:3rem;margin-bottom:1rem;display:block"></i>No videos yet<br>Be the first to upload!</div>`;
+    grid.innerHTML = `<div style="text-align:center;padding:60px;color:#777">No videos yet. Be the first to upload!</div>`;
     return;
   }
   
   grid.innerHTML = allVideos.map(v => `
     <div class="video-card" onclick="openPlayer('${v.id}')">
       <div class="thumbnail">
-        <img src="${v.thumbnail_url || 'https://placehold.co/480x270/222/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/222/fff?text=🎬'">
+        <img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/1a1a1a/fff?text=🎬'">
         <div class="duration">${v.duration || '0:00'}</div>
       </div>
       <div class="video-info">
-        <div class="channel-icon" onclick="event.stopPropagation();openChannelPage('${v.user_id}')">
-          <img src="${v.profiles?.avatar_url || ''}" onerror="this.src=''">
-        </div>
+        <div class="channel-icon">${(v.username || 'U').charAt(0).toUpperCase()}</div>
         <div class="video-details">
-          <h3>${escHtml(v.title)}</h3>
-          <p onclick="event.stopPropagation();openChannelPage('${v.user_id}')" style="cursor:pointer">${escHtml(v.username || 'Unknown')}</p>
-          <p>${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</p>
+          <h3>${escapeHtml(v.title)}</h3>
+          <p>${escapeHtml(v.username || 'Unknown')} • ${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</p>
         </div>
       </div>
     </div>
   `).join('');
 }
 
-// Open Player
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// Open video player
 window.openPlayer = async function(videoId) {
   const video = allVideos.find(v => v.id === videoId);
   if (!video) return;
   
-  // Get channel profile
-  const { data: channelProfile } = await sb.from('profiles').select('*').eq('id', video.user_id).single();
-  const isSubscribed = currentUser ? await checkSubscriptionStatus(currentUser.id, video.user_id) : false;
-  
-  // Increment views
+  // Increment view count
   await sb.from('videos').update({ views: (video.views || 0) + 1 }).eq('id', videoId);
   video.views = (video.views || 0) + 1;
   
-  const modal = document.createElement('div');
-  modal.className = 'player-overlay open';
-  modal.id = 'playerModal';
-  modal.innerHTML = `
+  const overlay = document.createElement('div');
+  overlay.className = 'player-overlay open';
+  overlay.id = 'playerModal';
+  overlay.innerHTML = `
     <div class="player-container">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-        <button onclick="closePlayer()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer"><i class="fas fa-arrow-left"></i> Back</button>
+      <button onclick="closePlayer()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;margin-bottom:16px;">← Back</button>
+      <div class="video-player">
+        <video controls autoplay src="${video.video_url}"></video>
       </div>
-      <div class="player-main">
-        <div>
-          <div class="video-player"><video controls autoplay src="${video.video_url}"></video></div>
-          <h3 class="video-title">${escHtml(video.title)}</h3>
-          <div class="video-actions">
-            <div class="action-buttons">
-              <button class="action-btn" id="likeBtn"><i class="fas fa-thumbs-up"></i> <span id="likeCount">${video.likes || 0}</span></button>
-              <button class="action-btn" id="dislikeBtn"><i class="fas fa-thumbs-down"></i> <span id="dislikeCount">${video.dislikes || 0}</span></button>
-              <button class="action-btn" id="shareBtn"><i class="fas fa-share"></i> Share</button>
-            </div>
+      <h3 style="margin:16px 0 8px">${escapeHtml(video.title)}</h3>
+      <p style="color:#aaa;margin-bottom:16px">${formatViews(video.views)} views • ${getTimeAgo(video.created_at)}</p>
+      <div style="background:#1a1a1a;padding:16px;border-radius:12px;margin:16px 0">
+        <p><strong>${escapeHtml(video.username || 'Unknown User')}</strong></p>
+        <p style="color:#aaa;margin-top:8px">${escapeHtml(video.description || 'No description')}</p>
+      </div>
+      <div>
+        <h4>Comments</h4>
+        <div id="commentsList" style="margin:16px 0"></div>
+        ${currentUser ? `
+          <div style="display:flex;gap:8px;margin-top:16px">
+            <input type="text" id="commentInput" placeholder="Add a comment..." style="flex:1;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:40px;padding:10px 16px;color:white">
+            <button onclick="postComment('${video.id}')" style="background:#ff4444;border:none;padding:10px 20px;border-radius:40px;color:white;cursor:pointer">Post</button>
           </div>
-          <div class="channel-section">
-            <div class="channel-left" onclick="openChannelPage('${video.user_id}')">
-              <div class="channel-avatar-md"><img src="${channelProfile?.avatar_url || ''}" onerror="this.src=''"></div>
-              <div class="channel-info">
-                <h4>${escHtml(video.username || 'Unknown')}</h4>
-                <p>${formatViews(channelProfile?.subscriber_count || 0)} subscribers</p>
-              </div>
-            </div>
-            <button class="subscribe-btn ${isSubscribed ? 'subscribed' : ''}" id="subscribeBtn">${isSubscribed ? 'Subscribed' : 'Subscribe'}</button>
-          </div>
-          <div class="description">${escHtml(video.description || 'No description')}</div>
-          <div class="comments-section">
-            <h4>Comments</h4>
-            <div id="commentsList" style="margin: 1rem 0;"></div>
-            ${currentUser ? `
-              <div class="comment-input">
-                <div class="comment-avatar"><img src="${currentUser.user_metadata?.avatar_url || ''}" onerror="this.src=''"></div>
-                <input type="text" id="commentInput" placeholder="Add a comment...">
-                <button class="subscribe-btn" style="background:var(--blue)" onclick="postComment('${video.id}')">Post</button>
-              </div>
-            ` : '<p><button class="subscribe-btn" onclick="openAuthModal()">Sign in</button> to comment</p>'}
-          </div>
-        </div>
-        <div>
-          <h4>Up next</h4>
-          <div id="relatedVideos"></div>
-        </div>
+        ` : '<p><button onclick="openAuthModal()" style="background:#ff4444;border:none;padding:8px 16px;border-radius:40px;color:white;cursor:pointer">Sign in</button> to comment</p>'}
       </div>
     </div>
   `;
-  document.body.appendChild(modal);
-  
+  document.body.appendChild(overlay);
   await loadComments(video.id);
-  loadRelated(video.id);
-  
-  // Like button
-  document.getElementById('likeBtn').onclick = async () => {
-    if (!currentUser) { openAuthModal(); return; }
-    const hasLiked = await sb.from('video_likes').select('*').eq('user_id', currentUser.id).eq('video_id', video.id).single();
-    const hasDisliked = await sb.from('video_dislikes').select('*').eq('user_id', currentUser.id).eq('video_id', video.id).single();
-    
-    if (hasLiked.data) {
-      await sb.from('video_likes').delete().eq('user_id', currentUser.id).eq('video_id', video.id);
-      video.likes--;
-    } else {
-      if (hasDisliked.data) {
-        await sb.from('video_dislikes').delete().eq('user_id', currentUser.id).eq('video_id', video.id);
-        video.dislikes--;
-      }
-      await sb.from('video_likes').insert({ user_id: currentUser.id, video_id: video.id });
-      video.likes++;
-    }
-    await sb.from('videos').update({ likes: video.likes, dislikes: video.dislikes }).eq('id', video.id);
-    document.getElementById('likeCount').innerText = video.likes;
-    document.getElementById('dislikeCount').innerText = video.dislikes;
-  };
-  
-  document.getElementById('dislikeBtn').onclick = async () => {
-    if (!currentUser) { openAuthModal(); return; }
-    const hasDisliked = await sb.from('video_dislikes').select('*').eq('user_id', currentUser.id).eq('video_id', video.id).single();
-    const hasLiked = await sb.from('video_likes').select('*').eq('user_id', currentUser.id).eq('video_id', video.id).single();
-    
-    if (hasDisliked.data) {
-      await sb.from('video_dislikes').delete().eq('user_id', currentUser.id).eq('video_id', video.id);
-      video.dislikes--;
-    } else {
-      if (hasLiked.data) {
-        await sb.from('video_likes').delete().eq('user_id', currentUser.id).eq('video_id', video.id);
-        video.likes--;
-      }
-      await sb.from('video_dislikes').insert({ user_id: currentUser.id, video_id: video.id });
-      video.dislikes++;
-    }
-    await sb.from('videos').update({ likes: video.likes, dislikes: video.dislikes }).eq('id', video.id);
-    document.getElementById('likeCount').innerText = video.likes;
-    document.getElementById('dislikeCount').innerText = video.dislikes;
-  };
-  
-  document.getElementById('shareBtn').onclick = () => {
-    navigator.clipboard?.writeText(window.location.href);
-    showToast('Link copied!', 'success');
-  };
-  
-  document.getElementById('subscribeBtn').onclick = async () => {
-    if (!currentUser) { openAuthModal(); return; }
-    const subbed = await checkSubscriptionStatus(currentUser.id, video.user_id);
-    if (subbed) {
-      await sb.from('subscriptions').delete().eq('subscriber_id', currentUser.id).eq('channel_id', video.user_id);
-      document.getElementById('subscribeBtn').innerText = 'Subscribe';
-      document.getElementById('subscribeBtn').classList.remove('subscribed');
-      showToast('Unsubscribed');
-    } else {
-      await sb.from('subscriptions').insert({ subscriber_id: currentUser.id, channel_id: video.user_id });
-      document.getElementById('subscribeBtn').innerText = 'Subscribed';
-      document.getElementById('subscribeBtn').classList.add('subscribed');
-      showToast('Subscribed to channel!');
-    }
-  };
 };
-
-async function checkSubscriptionStatus(userId, channelId) {
-  const { data } = await sb.from('subscriptions').select('*').eq('subscriber_id', userId).eq('channel_id', channelId).single();
-  return !!data;
-}
 
 window.closePlayer = function() {
   document.getElementById('playerModal')?.remove();
 };
 
 async function loadComments(videoId) {
-  const { data } = await sb.from('comments').select('*, profiles:user_id(username, avatar_url)').eq('video_id', videoId).order('created_at', { ascending: false });
+  const { data } = await sb.from('comments').select('*').eq('video_id', videoId).order('created_at', { ascending: false });
   const container = document.getElementById('commentsList');
   if (!container) return;
   if (!data || data.length === 0) {
-    container.innerHTML = '<div style="color: var(--text3); text-align: center; padding: 1rem;">No comments yet.</div>';
+    container.innerHTML = '<p style="color:#777">No comments yet.</p>';
     return;
   }
   container.innerHTML = data.map(c => `
-    <div class="comment">
-      <div class="comment-avatar"><img src="${c.profiles?.avatar_url || ''}" onerror="this.src=''"></div>
-      <div class="comment-content">
-        <div class="comment-author">${escHtml(c.profiles?.username || 'User')}</div>
-        <div class="comment-text">${escHtml(c.text)}</div>
-        <div class="comment-time">${getTimeAgo(c.created_at)}</div>
-      </div>
+    <div style="background:#1a1a1a;border-radius:8px;padding:12px;margin-bottom:8px">
+      <strong>${escapeHtml(c.username)}</strong>
+      <p style="margin-top:4px">${escapeHtml(c.text)}</p>
+      <p style="font-size:11px;color:#777;margin-top:4px">${getTimeAgo(c.created_at)}</p>
     </div>
   `).join('');
 }
@@ -522,7 +484,7 @@ window.postComment = async function(videoId) {
   await sb.from('comments').insert({
     video_id: videoId,
     user_id: currentUser.id,
-    username: currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User',
+    username: currentUser.email?.split('@')[0] || 'User',
     text: text
   });
   input.value = '';
@@ -530,48 +492,7 @@ window.postComment = async function(videoId) {
   showToast('Comment posted!', 'success');
 };
 
-function loadRelated(videoId) {
-  const related = allVideos.filter(v => v.id !== videoId).slice(0, 5);
-  const container = document.getElementById('relatedVideos');
-  if (!container) return;
-  container.innerHTML = related.map(v => `
-    <div class="related-card" onclick="openPlayer('${v.id}')">
-      <div class="related-thumb"><img src="${v.thumbnail_url || 'https://placehold.co/160x90/222/fff?text=🎬'}" onerror="this.src='https://placehold.co/160x90/222/fff?text=🎬'"></div>
-      <div class="related-info">
-        <h4>${escHtml(v.title)}</h4>
-        <p>${escHtml(v.username)} • ${formatViews(v.views)} views</p>
-      </div>
-    </div>
-  `).join('');
-}
-
-// Open Channel Page
-window.openChannelPage = async function(userId) {
-  const { data: profile } = await sb.from('profiles').select('*').eq('id', userId).single();
-  const { data: channelVideos } = await sb.from('videos').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-  const isSubscribed = currentUser ? await checkSubscriptionStatus(currentUser.id, userId) : false;
-  
-  currentChannelView = userId;
-  const grid = document.getElementById('videoGrid');
-  const pageTitle = document.getElementById('pageTitle');
-  
-  if (grid && pageTitle) {
-    pageTitle.innerHTML = `<i class="fas fa-user"></i> ${escHtml(profile?.username || 'Channel')}`;
-    
-    if (!channelVideos || channelVideos.length === 0) {
-      grid.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text3)">No videos uploaded yet.</div>`;
-    } else {
-      grid.innerHTML = channelVideos.map(v => `
-        <div class="video-card" onclick="openPlayer('${v.id}')">
-          <div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/222/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/222/fff?text=🎬'"><div class="duration">${v.duration || '0:00'}</div></div>
-          <div class="video-info"><div class="channel-icon"><img src="${profile?.avatar_url || ''}" onerror="this.src=''"></div><div class="video-details"><h3>${escHtml(v.title)}</h3><p>${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</p></div></div>
-        </div>
-      `).join('');
-    }
-  }
-};
-
-// Upload Modal with Thumbnail
+// Upload modal
 window.openUploadModal = function() {
   if (!currentUser) { openAuthModal(); return; }
   
@@ -584,14 +505,18 @@ window.openUploadModal = function() {
       <div class="field"><label>Title *</label><input type="text" id="uploadTitle" placeholder="Video title"></div>
       <div class="field"><label>Description</label><input type="text" id="uploadDesc" placeholder="Description"></div>
       <div class="field"><label>Category</label>
-        <select id="uploadCat"><option value="other">Other</option><option value="music">Music</option><option value="gaming">Gaming</option><option value="tech">Tech</option><option value="education">Education</option><option value="sports">Sports</option><option value="vlogs">Vlogs</option><option value="comedy">Comedy</option></select>
+        <select id="uploadCat">
+          <option value="other">Other</option><option value="music">Music</option><option value="gaming">Gaming</option>
+          <option value="tech">Tech</option><option value="education">Education</option><option value="sports">Sports</option>
+          <option value="vlogs">Vlogs</option><option value="comedy">Comedy</option>
+        </select>
       </div>
-      <div class="field"><label>Video File</label><input type="file" id="videoFile" accept="video/*"></div>
-      <div class="field"><label>Thumbnail (optional)</label><input type="file" id="thumbnailFile" accept="image/*"></div>
-      <div id="uploadProgress" style="display:none;margin:0.5rem 0;"><div style="background:var(--bg3);border-radius:40px;height:6px;"><div id="progressBar" style="width:0%;height:100%;background:var(--accent);border-radius:40px;"></div></div><div id="progressText" style="font-size:0.75rem;margin-top:0.3rem;">Uploading...</div></div>
+      <div class="field"><label>Video File (MP4, MOV, WebM)</label><input type="file" id="videoFile" accept="video/*"></div>
+      <div class="field"><label>Thumbnail Image (optional)</label><input type="file" id="thumbFile" accept="image/*"></div>
+      <div id="uploadProgress" style="display:none;margin:10px 0"><div style="background:#2a2a2a;border-radius:40px;height:6px"><div id="progressBar" style="width:0%;height:100%;background:#ff4444;border-radius:40px"></div></div><p style="font-size:12px;margin-top:5px" id="progressText">Uploading...</p></div>
       <button class="btn-primary" id="doUploadBtn">Upload</button>
       <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
-      <div id="uploadError" class="error-text"></div>
+      <div id="uploadError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
     </div>
   `;
   document.body.appendChild(modal);
@@ -600,7 +525,7 @@ window.openUploadModal = function() {
     const title = document.getElementById('uploadTitle').value.trim();
     if (!title) { document.getElementById('uploadError').innerText = 'Title is required'; return; }
     const videoFile = document.getElementById('videoFile').files[0];
-    if (!videoFile) { document.getElementById('uploadError').innerText = 'Please select a video'; return; }
+    if (!videoFile) { document.getElementById('uploadError').innerText = 'Select a video file'; return; }
     
     const btn = document.getElementById('doUploadBtn');
     btn.disabled = true;
@@ -610,13 +535,19 @@ window.openUploadModal = function() {
     const ext = videoFile.name.split('.').pop();
     const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
     
+    // Upload to Supabase Storage
     const { error: uploadError } = await sb.storage.from('videos').upload(fileName, videoFile);
-    if (uploadError) { document.getElementById('uploadError').innerText = 'Upload failed: ' + uploadError.message; btn.disabled = false; return; }
+    if (uploadError) {
+      document.getElementById('uploadError').innerText = 'Upload failed: ' + uploadError.message;
+      btn.disabled = false;
+      return;
+    }
     
     const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(fileName);
     
+    // Upload thumbnail if provided
     let thumbnailUrl = null;
-    const thumbFile = document.getElementById('thumbnailFile').files[0];
+    const thumbFile = document.getElementById('thumbFile').files[0];
     if (thumbFile) {
       const thumbExt = thumbFile.name.split('.').pop();
       const thumbName = `${currentUser.id}/thumb_${Date.now()}.${thumbExt}`;
@@ -625,20 +556,24 @@ window.openUploadModal = function() {
       thumbnailUrl = thumbData.publicUrl;
     }
     
+    // Save to database
     const { error: dbError } = await sb.from('videos').insert({
       user_id: currentUser.id,
-      username: currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User',
+      username: currentUser.email?.split('@')[0] || 'User',
       title: title,
       description: document.getElementById('uploadDesc').value,
       category: document.getElementById('uploadCat').value,
       video_url: publicUrl,
       thumbnail_url: thumbnailUrl,
       views: 0,
-      likes: 0,
-      dislikes: 0
+      likes: 0
     });
     
-    if (dbError) { document.getElementById('uploadError').innerText = 'DB error: ' + dbError.message; return; }
+    if (dbError) {
+      document.getElementById('uploadError').innerText = 'Database error: ' + dbError.message;
+      btn.disabled = false;
+      return;
+    }
     
     showToast('Video uploaded successfully!', 'success');
     closeUploadModal();
@@ -650,7 +585,7 @@ window.closeUploadModal = function() {
   document.getElementById('uploadModal')?.remove();
 };
 
-// Auth
+// Auth Modal
 window.openAuthModal = function() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay open';
@@ -658,10 +593,22 @@ window.openAuthModal = function() {
   modal.innerHTML = `
     <div class="modal">
       <h2>APILAGE TUBE</h2>
-      <div class="auth-tabs"><div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div><div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div></div>
-      <div id="signinForm"><div class="field"><label>Email</label><input type="email" id="signinEmail"></div><div class="field"><label>Password</label><input type="password" id="signinPassword"></div><button class="btn-primary" onclick="handleSignIn()">Sign In</button></div>
-      <div id="signupForm" style="display:none;"><div class="field"><label>Username</label><input type="text" id="signupName"></div><div class="field"><label>Email</label><input type="email" id="signupEmail"></div><div class="field"><label>Password</label><input type="password" id="signupPassword"></div><button class="btn-primary" onclick="handleSignUp()">Create Account</button></div>
-      <div id="authError" class="error-text"></div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div>
+        <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+      </div>
+      <div id="signinForm">
+        <div class="field"><label>Email</label><input type="email" id="signinEmail"></div>
+        <div class="field"><label>Password</label><input type="password" id="signinPassword"></div>
+        <button class="btn-primary" onclick="handleSignIn()">Sign In</button>
+      </div>
+      <div id="signupForm" style="display:none">
+        <div class="field"><label>Username</label><input type="text" id="signupName"></div>
+        <div class="field"><label>Email</label><input type="email" id="signupEmail"></div>
+        <div class="field"><label>Password (min 6 chars)</label><input type="password" id="signupPassword"></div>
+        <button class="btn-primary" onclick="handleSignUp()">Create Account</button>
+      </div>
+      <div id="authError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
       <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
     </div>
   `;
@@ -669,10 +616,13 @@ window.openAuthModal = function() {
 };
 
 window.closeAuthModal = () => document.getElementById('authModal')?.remove();
+
 window.switchAuthTab = (tab) => {
   document.getElementById('signinForm').style.display = tab === 'signin' ? 'block' : 'none';
   document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'signin' && i===0) || (tab === 'signup' && i===1)));
+  const tabs = document.querySelectorAll('.auth-tab');
+  tabs[0].classList.toggle('active', tab === 'signin');
+  tabs[1].classList.toggle('active', tab === 'signup');
 };
 
 window.handleSignIn = async () => {
@@ -689,50 +639,125 @@ window.handleSignUp = async () => {
   const username = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-  if (password.length < 6) { document.getElementById('authError').innerText = 'Password min 6 chars'; return; }
+  if (password.length < 6) { document.getElementById('authError').innerText = 'Password must be at least 6 characters'; return; }
   const { data, error } = await sb.auth.signUp({ email, password, options: { data: { username } } });
   if (error) { document.getElementById('authError').innerText = error.message; return; }
-  if (data.user) await sb.from('profiles').upsert({ id: data.user.id, username: username });
-  showToast('Account created! Sign in now.', 'success');
+  if (data.user) {
+    await sb.from('profiles').upsert({ id: data.user.id, username: username });
+  }
+  showToast('Account created! Please sign in.', 'success');
   switchAuthTab('signin');
+  document.getElementById('signinEmail').value = email;
 };
 
-window.signOut = async () => { await sb.auth.signOut(); currentUser = null; location.reload(); };
+window.signOut = async () => {
+  await sb.auth.signOut();
+  currentUser = null;
+  location.reload();
+};
 
 function updateAuthUI() {
-  const authContainer = document.getElementById('authContainer');
-  if (!authContainer) return;
+  const container = document.getElementById('authContainer');
+  if (!container) return;
   if (currentUser) {
-    authContainer.innerHTML = `<div class="avatar" onclick="toggleUserMenu()"><img src="${currentUser.user_metadata?.avatar_url || ''}" onerror="this.style.display='none';this.parentElement.innerText='${currentUser.email?.charAt(0).toUpperCase() || 'U'}'"></div><div id="userMenu" style="display:none;position:absolute;top:50px;right:1rem;background:var(--bg2);border-radius:12px;padding:0.5rem;z-index:200;"><div class="sidebar-item" onclick="openChannelPage('${currentUser.id}')"><i class="fas fa-user"></i> My Channel</div><div class="sidebar-item" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</div></div>`;
+    container.innerHTML = `<div class="avatar" onclick="toggleUserMenu()">${currentUser.email?.charAt(0).toUpperCase() || 'U'}</div><div id="userMenu" style="display:none;position:absolute;top:50px;right:20px;background:#1a1a1a;border-radius:12px;padding:8px;z-index:200"><div class="sidebar-item" onclick="signOut()">Sign Out</div></div>`;
   } else {
-    authContainer.innerHTML = `<button class="upload-btn" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>`;
+    container.innerHTML = `<button class="btn-signin" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>`;
   }
 }
 
-window.toggleUserMenu = () => { const menu = document.getElementById('userMenu'); if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; };
-window.goHome = () => { currentCategory = 'all'; currentSearch = ''; document.getElementById('searchInput').value = ''; document.getElementById('pageTitle').innerHTML = 'All Videos <span class="live-badge">LIVE</span>'; currentChannelView = null; loadVideos(); };
-window.setCategory = (cat) => { currentCategory = cat; currentSearch = ''; document.getElementById('pageTitle').innerHTML = cat === 'all' ? 'All Videos' : cat.charAt(0).toUpperCase() + cat.slice(1); loadVideos(); };
-window.goTrending = async () => { const { data } = await sb.from('videos').select('*').order('views', { ascending: false }).limit(20); if (data) { allVideos = data; const grid = document.getElementById('videoGrid'); if (grid) renderVideoGridDirect(data); } document.getElementById('pageTitle').innerHTML = 'Trending 🔥'; };
-function renderVideoGridDirect(videos) { const grid = document.getElementById('videoGrid'); if (!grid) return; grid.innerHTML = videos.map(v => `<div class="video-card" onclick="openPlayer('${v.id}')"><div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/222/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/222/fff?text=🎬'"><div class="duration">${v.duration || '0:00'}</div></div><div class="video-info"><div class="channel-icon"><img src="" onerror="this.src=''"></div><div class="video-details"><h3>${escHtml(v.title)}</h3><p>${escHtml(v.username)} • ${formatViews(v.views)} views</p></div></div></div>`).join(''); }
+window.toggleUserMenu = () => {
+  const menu = document.getElementById('userMenu');
+  if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+};
 
+window.goHome = () => {
+  currentCategory = 'all';
+  document.getElementById('pageTitle').innerHTML = 'All Videos <span class="live-badge">LIVE</span>';
+  loadVideos();
+};
+
+window.setCategory = (cat) => {
+  currentCategory = cat;
+  document.getElementById('pageTitle').innerHTML = cat === 'all' ? 'All Videos' : cat.charAt(0).toUpperCase() + cat.slice(1);
+  loadVideos();
+};
+
+window.goTrending = async () => {
+  const { data } = await sb.from('videos').select('*').order('views', { ascending: false }).limit(20);
+  if (data) {
+    allVideos = data;
+    const grid = document.getElementById('videoGrid');
+    if (grid) {
+      grid.innerHTML = data.map(v => `
+        <div class="video-card" onclick="openPlayer('${v.id}')">
+          <div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/1a1a1a/fff?text=🎬'"><div class="duration">${v.duration || '0:00'}</div></div>
+          <div class="video-info"><div class="channel-icon">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><h3>${escapeHtml(v.title)}</h3><p>${escapeHtml(v.username)} • ${formatViews(v.views)} views</p></div></div>
+        </div>
+      `).join('');
+    }
+  }
+  document.getElementById('pageTitle').innerHTML = 'Trending 🔥';
+};
+
+// Initialize app
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) currentUser = session.user;
-  sb.auth.onAuthStateChange((event, session) => { currentUser = session?.user || null; updateAuthUI(); if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') loadVideos(); });
+  
+  sb.auth.onAuthStateChange((event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI();
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') loadVideos();
+  });
+  
   renderApp();
 }
 
 function renderApp() {
   const app = document.getElementById('app');
   app.innerHTML = `
-    <div class="navbar"><div class="nav-left"><button class="menu-btn" id="menuToggle"><i class="fas fa-bars"></i></button><div class="logo" onclick="goHome()">APILAGE <span>TUBE</span></div></div><div class="nav-center"><div class="search-container"><input type="text" id="searchInput" placeholder="Search..."><button onclick="currentSearch=document.getElementById('searchInput').value;loadVideos()"><i class="fas fa-search"></i></button></div></div><div class="nav-right"><button class="upload-btn" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button><div id="authContainer"></div></div></div>
-    <div class="sidebar"><div class="sidebar-item" onclick="goHome()"><i class="fas fa-home"></i> Home</div><div class="sidebar-item" onclick="goTrending()"><i class="fas fa-fire"></i> Trending</div><div class="sidebar-item" onclick="openChannelPage(currentUser?.id || '')"><i class="fas fa-user"></i> My Channel</div><div class="sidebar-divider"></div><div class="sidebar-label">Categories</div><div class="sidebar-item" onclick="setCategory('all')"><i class="fas fa-globe"></i> All</div><div class="sidebar-item" onclick="setCategory('music')"><i class="fas fa-music"></i> Music</div><div class="sidebar-item" onclick="setCategory('gaming')"><i class="fas fa-gamepad"></i> Gaming</div><div class="sidebar-item" onclick="setCategory('tech')"><i class="fas fa-microchip"></i> Tech</div><div class="sidebar-item" onclick="setCategory('education')"><i class="fas fa-graduation-cap"></i> Education</div><div class="sidebar-item" onclick="setCategory('sports')"><i class="fas fa-futbol"></i> Sports</div><div class="sidebar-item" onclick="setCategory('vlogs')"><i class="fas fa-video"></i> Vlogs</div><div class="sidebar-item" onclick="setCategory('comedy')"><i class="fas fa-laugh"></i> Comedy</div></div>
-    <div class="main-content"><div class="section-header"><div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div></div><div id="videoGrid" class="video-grid"></div><div id="loader" class="loader"><div class="spinner"></div></div></div>
+    <div class="navbar">
+      <div class="logo" onclick="goHome()">APILAGE <span>TUBE</span></div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search videos...">
+        <button onclick="currentCategory='all';currentSearch=document.getElementById('searchInput').value;loadVideos()"><i class="fas fa-search"></i></button>
+      </div>
+      <div style="display:flex">
+        <button class="btn-upload" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button>
+        <div id="authContainer"></div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-item" onclick="goHome()"><i class="fas fa-home"></i> Home</div>
+      <div class="sidebar-item" onclick="goTrending()"><i class="fas fa-fire"></i> Trending</div>
+      <div class="sidebar-item" onclick="openAuthModal()"><i class="fas fa-user"></i> My Channel</div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">Categories</div>
+      <div class="sidebar-item" onclick="setCategory('all')"><i class="fas fa-globe"></i> All</div>
+      <div class="sidebar-item" onclick="setCategory('music')"><i class="fas fa-music"></i> Music</div>
+      <div class="sidebar-item" onclick="setCategory('gaming')"><i class="fas fa-gamepad"></i> Gaming</div>
+      <div class="sidebar-item" onclick="setCategory('tech')"><i class="fas fa-microchip"></i> Tech</div>
+      <div class="sidebar-item" onclick="setCategory('education')"><i class="fas fa-graduation-cap"></i> Education</div>
+      <div class="sidebar-item" onclick="setCategory('sports')"><i class="fas fa-futbol"></i> Sports</div>
+      <div class="sidebar-item" onclick="setCategory('vlogs')"><i class="fas fa-video"></i> Vlogs</div>
+      <div class="sidebar-item" onclick="setCategory('comedy')"><i class="fas fa-laugh"></i> Comedy</div>
+    </div>
+    <div class="main-content">
+      <div class="section-header"><div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div></div>
+      <div id="videoGrid" class="video-grid"></div>
+      <div id="loader" class="loader"><div class="spinner"></div></div>
+    </div>
   `;
-  document.getElementById('menuToggle').onclick = () => document.querySelector('.sidebar').classList.toggle('collapsed');
   updateAuthUI();
   loadVideos();
 }
+
+// Click outside to close user menu
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('userMenu');
+  if (menu && !e.target.closest('#authContainer')) menu.style.display = 'none';
+});
 
 init();
 </script>

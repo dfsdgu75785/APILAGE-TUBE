@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,6 +106,7 @@
     .modal {
       background: #1a1a1a; border-radius: 16px; padding: 24px;
       width: 100%; max-width: 500px; border: 1px solid #2a2a2a;
+      max-height: 90vh; overflow-y: auto;
     }
     .modal h2 { margin-bottom: 20px; }
     .field { margin-bottom: 16px; }
@@ -219,6 +222,15 @@
       background: #1a1a1a; border-left: 3px solid #ff4444;
       padding: 12px 16px; border-radius: 8px; margin-top: 8px;
     }
+    .loader {
+      display: flex; justify-content: center; padding: 40px;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid #2a2a2a;
+      border-top-color: #ff4444; border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-220px); }
       .main-content { margin-left: 0; }
@@ -232,7 +244,7 @@
 
 <script>
 // ============================================================
-// SUPABASE CREDENTIALS
+// SUPABASE CREDENTIALS - YOUR DATABASE
 // ============================================================
 const SUPABASE_URL = 'https://jgjttaalzpxhjxhtxkir.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpnanR0YWFsenB4aGp4aHR4a2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3NjM5OTIsImV4cCI6MjA5MDMzOTk5Mn0.WCjIpGL_xXIWXKA8a-GLWCoYXqHjy1BSPhRKm_PxGiA';
@@ -321,17 +333,14 @@ async function openPlayer(videoId) {
   if (!video) return;
   currentVideo = video;
   
-  // Get channel profile
   const { data: profile } = await sb.from('profiles').select('*').eq('id', video.user_id).single();
   
-  // Check if subscribed
   let isSubscribed = false;
   if (currentUser) {
     const { data: sub } = await sb.from('subscriptions').select('*').eq('subscriber_id', currentUser.id).eq('channel_id', video.user_id).single();
     isSubscribed = !!sub;
   }
   
-  // Increment views
   await sb.from('videos').update({ views: (video.views || 0) + 1 }).eq('id', videoId);
   video.views = (video.views || 0) + 1;
   
@@ -541,8 +550,14 @@ async function openChannelPage(userId) {
   }
 }
 
+// ============================================================
+// UPLOAD FUNCTION - FIXED VERSION
+// ============================================================
 function openUploadModal() {
-  if (!currentUser) { openAuthModal(); return; }
+  if (!currentUser) { 
+    openAuthModal(); 
+    return; 
+  }
   
   const modal = document.createElement('div');
   modal.className = 'modal-overlay open';
@@ -550,70 +565,141 @@ function openUploadModal() {
   modal.innerHTML = `
     <div class="modal">
       <h2><i class="fas fa-upload"></i> Upload Video</h2>
-      <div class="field"><label>Title *</label><input type="text" id="uploadTitle" placeholder="Video title"></div>
-      <div class="field"><label>Description</label><input type="text" id="uploadDesc" placeholder="Description"></div>
-      <div class="field"><label>Category</label>
-        <select id="uploadCat"><option value="other">Other</option><option value="music">Music</option><option value="gaming">Gaming</option><option value="tech">Tech</option><option value="education">Education</option><option value="sports">Sports</option><option value="vlogs">Vlogs</option><option value="comedy">Comedy</option></select>
+      <div class="field">
+        <label>Title *</label>
+        <input type="text" id="uploadTitle" placeholder="Enter video title">
       </div>
-      <div class="field"><label>Video File</label><input type="file" id="videoFile" accept="video/*"></div>
-      <div class="field"><label>Thumbnail (optional)</label><input type="file" id="thumbFile" accept="image/*"></div>
-      <div id="uploadProgress" style="display:none;margin:10px 0"><div style="background:#2a2a2a;border-radius:40px;height:6px"><div id="progressBar" style="width:0%;height:100%;background:#ff4444;border-radius:40px"></div></div><p style="font-size:12px;margin-top:5px" id="progressText">Uploading...</p></div>
-      <button class="btn-primary" id="doUploadBtn">Upload</button>
+      <div class="field">
+        <label>Description</label>
+        <input type="text" id="uploadDesc" placeholder="Tell viewers about this video">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="uploadCat">
+          <option value="other">Other</option>
+          <option value="music">Music</option>
+          <option value="gaming">Gaming</option>
+          <option value="tech">Tech</option>
+          <option value="education">Education</option>
+          <option value="sports">Sports</option>
+          <option value="vlogs">Vlogs</option>
+          <option value="comedy">Comedy</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Video File (MP4, MOV, WebM) *</label>
+        <input type="file" id="videoFile" accept="video/*">
+        <p style="font-size:11px; color:#777; margin-top:5px;">Max file size: 500MB</p>
+      </div>
+      <div class="field">
+        <label>Thumbnail Image (optional)</label>
+        <input type="file" id="thumbFile" accept="image/*">
+      </div>
+      <div id="uploadProgress" style="display:none; margin:10px 0">
+        <div style="background:#2a2a2a; border-radius:40px; height:6px">
+          <div id="progressBar" style="width:0%; height:100%; background:#ff4444; border-radius:40px"></div>
+        </div>
+        <p style="font-size:12px; margin-top:5px" id="progressText">Uploading...</p>
+      </div>
+      <button class="btn-primary" id="doUploadBtn">Upload Video</button>
       <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
-      <div id="uploadError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
+      <div id="uploadError" style="color:#ff4444; font-size:12px; margin-top:10px; text-align:center"></div>
     </div>
   `;
   document.body.appendChild(modal);
   
   document.getElementById('doUploadBtn').onclick = async () => {
     const title = document.getElementById('uploadTitle').value.trim();
-    if (!title) { document.getElementById('uploadError').innerText = 'Title required'; return; }
+    if (!title) {
+      document.getElementById('uploadError').innerText = 'Title is required';
+      return;
+    }
+    
     const videoFile = document.getElementById('videoFile').files[0];
-    if (!videoFile) { document.getElementById('uploadError').innerText = 'Select a video'; return; }
+    if (!videoFile) {
+      document.getElementById('uploadError').innerText = 'Please select a video file';
+      return;
+    }
+    
+    if (videoFile.size > 500 * 1024 * 1024) {
+      document.getElementById('uploadError').innerText = 'File too large (max 500MB)';
+      return;
+    }
     
     const btn = document.getElementById('doUploadBtn');
     btn.disabled = true;
     btn.textContent = 'Uploading...';
     document.getElementById('uploadProgress').style.display = 'block';
     
-    const ext = videoFile.name.split('.').pop();
-    const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
-    
-    const { error: uploadError } = await sb.storage.from('videos').upload(fileName, videoFile);
-    if (uploadError) { document.getElementById('uploadError').innerText = 'Upload failed'; btn.disabled = false; return; }
-    
-    const { data: { publicUrl } } = sb.storage.from('videos').getPublicUrl(fileName);
-    
-    let thumbnailUrl = null;
-    const thumbFile = document.getElementById('thumbFile').files[0];
-    if (thumbFile) {
-      const thumbExt = thumbFile.name.split('.').pop();
-      const thumbName = `${currentUser.id}/thumb_${Date.now()}.${thumbExt}`;
-      await sb.storage.from('thumbnails').upload(thumbName, thumbFile);
-      const { data: thumbData } = sb.storage.from('thumbnails').getPublicUrl(thumbName);
-      thumbnailUrl = thumbData.publicUrl;
+    try {
+      // Upload video
+      const fileExt = videoFile.name.split('.').pop();
+      const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await sb.storage
+        .from('videos')
+        .upload(fileName, videoFile);
+      
+      if (uploadError) {
+        document.getElementById('uploadError').innerText = 'Upload failed: ' + uploadError.message;
+        btn.disabled = false;
+        btn.textContent = 'Upload Video';
+        document.getElementById('uploadProgress').style.display = 'none';
+        return;
+      }
+      
+      const { data: urlData } = sb.storage.from('videos').getPublicUrl(fileName);
+      const videoUrl = urlData.publicUrl;
+      
+      // Upload thumbnail if provided
+      let thumbnailUrl = null;
+      const thumbFile = document.getElementById('thumbFile').files[0];
+      if (thumbFile) {
+        const thumbExt = thumbFile.name.split('.').pop();
+        const thumbName = `${currentUser.id}/thumb_${Date.now()}.${thumbExt}`;
+        await sb.storage.from('thumbnails').upload(thumbName, thumbFile);
+        const { data: thumbData } = sb.storage.from('thumbnails').getPublicUrl(thumbName);
+        thumbnailUrl = thumbData.publicUrl;
+      }
+      
+      // Save to database
+      const { error: dbError } = await sb.from('videos').insert({
+        user_id: currentUser.id,
+        username: currentUser.email?.split('@')[0] || 'User',
+        title: title,
+        description: document.getElementById('uploadDesc').value || '',
+        category: document.getElementById('uploadCat').value,
+        video_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
+        views: 0,
+        likes: 0,
+        dislikes: 0
+      });
+      
+      if (dbError) {
+        document.getElementById('uploadError').innerText = 'Database error: ' + dbError.message;
+        btn.disabled = false;
+        btn.textContent = 'Upload Video';
+        document.getElementById('uploadProgress').style.display = 'none';
+        return;
+      }
+      
+      showToast('Video uploaded successfully!');
+      closeUploadModal();
+      loadVideos();
+      
+    } catch (err) {
+      document.getElementById('uploadError').innerText = 'Error: ' + err.message;
+      btn.disabled = false;
+      btn.textContent = 'Upload Video';
+      document.getElementById('uploadProgress').style.display = 'none';
     }
-    
-    const { error: dbError } = await sb.from('videos').insert({
-      user_id: currentUser.id,
-      username: currentUser.email?.split('@')[0] || 'User',
-      title: title,
-      description: document.getElementById('uploadDesc').value,
-      category: document.getElementById('uploadCat').value,
-      video_url: publicUrl,
-      thumbnail_url: thumbnailUrl,
-      views: 0, likes: 0, dislikes: 0
-    });
-    
-    if (dbError) { document.getElementById('uploadError').innerText = 'DB error'; return; }
-    
-    showToast('Video uploaded!');
-    closeUploadModal();
-    loadVideos();
   };
 }
 
-function closeUploadModal() { document.getElementById('uploadModal')?.remove(); }
+function closeUploadModal() { 
+  document.getElementById('uploadModal')?.remove(); 
+}
 
 function openAuthModal() {
   const modal = document.createElement('div');
@@ -622,9 +708,21 @@ function openAuthModal() {
   modal.innerHTML = `
     <div class="modal">
       <h2>APILAGE TUBE</h2>
-      <div class="auth-tabs"><div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div><div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div></div>
-      <div id="signinForm"><div class="field"><label>Email</label><input type="email" id="signinEmail"></div><div class="field"><label>Password</label><input type="password" id="signinPassword"></div><button class="btn-primary" onclick="handleSignIn()">Sign In</button></div>
-      <div id="signupForm" style="display:none"><div class="field"><label>Username</label><input type="text" id="signupName"></div><div class="field"><label>Email</label><input type="email" id="signupEmail"></div><div class="field"><label>Password</label><input type="password" id="signupPassword"></div><button class="btn-primary" onclick="handleSignUp()">Create Account</button></div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('signin')">Sign In</div>
+        <div class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</div>
+      </div>
+      <div id="signinForm">
+        <div class="field"><label>Email</label><input type="email" id="signinEmail"></div>
+        <div class="field"><label>Password</label><input type="password" id="signinPassword"></div>
+        <button class="btn-primary" onclick="handleSignIn()">Sign In</button>
+      </div>
+      <div id="signupForm" style="display:none">
+        <div class="field"><label>Username</label><input type="text" id="signupName"></div>
+        <div class="field"><label>Email</label><input type="email" id="signupEmail"></div>
+        <div class="field"><label>Password (min 6 chars)</label><input type="password" id="signupPassword"></div>
+        <button class="btn-primary" onclick="handleSignUp()">Create Account</button>
+      </div>
       <div id="authError" style="color:#ff4444;font-size:12px;margin-top:10px;text-align:center"></div>
       <button class="btn-secondary" onclick="closeAuthModal()">Cancel</button>
     </div>
@@ -632,21 +730,36 @@ function openAuthModal() {
   document.body.appendChild(modal);
 }
 
-function closeAuthModal() { document.getElementById('authModal')?.remove(); }
+function closeAuthModal() { 
+  document.getElementById('authModal')?.remove(); 
+}
 
 function switchAuthTab(tab) {
-  document.getElementById('signinForm').style.display = tab === 'signin' ? 'block' : 'none';
-  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  const signinForm = document.getElementById('signinForm');
+  const signupForm = document.getElementById('signupForm');
   const tabs = document.querySelectorAll('.auth-tab');
-  tabs[0].classList.toggle('active', tab === 'signin');
-  tabs[1].classList.toggle('active', tab === 'signup');
+  
+  if (tab === 'signin') {
+    signinForm.style.display = 'block';
+    signupForm.style.display = 'none';
+    tabs[0].classList.add('active');
+    tabs[1].classList.remove('active');
+  } else {
+    signinForm.style.display = 'none';
+    signupForm.style.display = 'block';
+    tabs[0].classList.remove('active');
+    tabs[1].classList.add('active');
+  }
 }
 
 async function handleSignIn() {
   const email = document.getElementById('signinEmail').value.trim();
   const password = document.getElementById('signinPassword').value;
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { document.getElementById('authError').innerText = error.message; return; }
+  if (error) { 
+    document.getElementById('authError').innerText = error.message; 
+    return; 
+  }
   closeAuthModal();
   showToast('Signed in!');
   setTimeout(() => location.reload(), 500);
@@ -656,20 +769,44 @@ async function handleSignUp() {
   const username = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-  if (password.length < 6) { document.getElementById('authError').innerText = 'Password min 6 chars'; return; }
-  const { data, error } = await sb.auth.signUp({ email, password, options: { data: { username } } });
-  if (error) { document.getElementById('authError').innerText = error.message; return; }
-  showToast('Account created! Sign in now.');
+  
+  if (password.length < 6) { 
+    document.getElementById('authError').innerText = 'Password must be at least 6 characters'; 
+    return; 
+  }
+  
+  const { data, error } = await sb.auth.signUp({ 
+    email, 
+    password, 
+    options: { data: { username } } 
+  });
+  
+  if (error) { 
+    document.getElementById('authError').innerText = error.message; 
+    return; 
+  }
+  
+  showToast('Account created! Please sign in.');
   switchAuthTab('signin');
+  document.getElementById('signinEmail').value = email;
 }
 
-async function signOut() { await sb.auth.signOut(); location.reload(); }
+async function signOut() { 
+  await sb.auth.signOut(); 
+  location.reload(); 
+}
 
 function updateAuthUI() {
   const container = document.getElementById('authContainer');
   if (!container) return;
+  
   if (currentUser) {
-    container.innerHTML = `<div class="avatar" onclick="toggleUserMenu()">${currentUser.email?.charAt(0).toUpperCase() || 'U'}</div><div id="userMenu" style="display:none;position:absolute;top:50px;right:20px;background:#1a1a1a;border-radius:12px;padding:8px;z-index:200"><div class="sidebar-item" onclick="signOut()">Sign Out</div></div>`;
+    container.innerHTML = `
+      <div class="avatar" onclick="toggleUserMenu()">${currentUser.email?.charAt(0).toUpperCase() || 'U'}</div>
+      <div id="userMenu" style="display:none;position:absolute;top:50px;right:20px;background:#1a1a1a;border-radius:12px;padding:8px;z-index:200">
+        <div class="sidebar-item" onclick="signOut()"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
+      </div>
+    `;
   } else {
     container.innerHTML = `<button class="btn-signin" onclick="openAuthModal()"><i class="fas fa-sign-in-alt"></i> Sign In</button>`;
   }
@@ -717,11 +854,13 @@ function myChannel() {
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) currentUser = session.user;
+  
   sb.auth.onAuthStateChange((event, session) => {
     currentUser = session?.user || null;
     updateAuthUI();
     loadVideos();
   });
+  
   renderApp();
 }
 
@@ -730,8 +869,14 @@ function renderApp() {
   app.innerHTML = `
     <div class="navbar">
       <div class="logo" onclick="goHome()">APILAGE <span>TUBE</span></div>
-      <div class="search-bar"><input type="text" id="searchInput" placeholder="Search..."><button onclick="currentCategory='all';loadVideos()"><i class="fas fa-search"></i></button></div>
-      <div style="display:flex"><button class="btn-upload" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button><div id="authContainer"></div></div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search videos...">
+        <button onclick="currentCategory='all';loadVideos()"><i class="fas fa-search"></i></button>
+      </div>
+      <div style="display:flex">
+        <button class="btn-upload" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload</button>
+        <div id="authContainer"></div>
+      </div>
     </div>
     <div class="sidebar">
       <div class="sidebar-item" onclick="goHome()"><i class="fas fa-home"></i> Home</div>
@@ -749,15 +894,25 @@ function renderApp() {
       <div class="sidebar-item" onclick="setCategory('comedy')"><i class="fas fa-laugh"></i> Comedy</div>
     </div>
     <div class="main-content">
-      <div class="section-header"><div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div></div>
+      <div class="section-header">
+        <div class="section-title" id="pageTitle">All Videos <span class="live-badge">LIVE</span></div>
+      </div>
       <div id="videoGrid" class="video-grid"></div>
-      <div id="loader" class="loader" style="display:flex;justify-content:center;padding:40px"><div style="width:40px;height:40px;border:3px solid #2a2a2a;border-top-color:#ff4444;border-radius:50%;animation:spin 0.6s linear infinite"></div></div>
+      <div id="loader" class="loader"><div class="spinner"></div></div>
     </div>
   `;
-  document.getElementById('loader').style.display = 'none';
+  
   updateAuthUI();
   loadVideos();
 }
+
+// Close user menu when clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('userMenu');
+  if (menu && !e.target.closest('#authContainer')) {
+    menu.style.display = 'none';
+  }
+});
 
 init();
 </script>

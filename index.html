@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APILAGE TUBE</title>
+  <title>APILAGE TUBE - Live Streaming</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -32,13 +32,15 @@
     .sidebar-item:hover { background: #1a1a1a; color: white; }
     .content { flex: 1; padding: 1.5rem; }
     .section-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; }
-    .live-badge { background: #ff4444; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; margin-left: 0.5rem; }
+    .live-badge { background: #ff4444; font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; margin-left: 0.5rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
     
     .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
     .video-card { background: #111; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid #2a2a2a; transition: transform 0.2s; }
     .video-card:hover { transform: translateY(-4px); border-color: #444; }
     .thumbnail { width: 100%; aspect-ratio: 16/9; background: #1a1a1a; position: relative; }
     .thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .live-indicator { position: absolute; top: 8px; left: 8px; background: #ff4444; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
     .duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 4px; font-size: 11px; }
     .video-info { padding: 0.75rem; display: flex; gap: 12px; }
     .channel-avatar { width: 36px; height: 36px; border-radius: 50%; background: #ff4444; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -54,13 +56,15 @@
     .field label { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 0.3rem; }
     .field input, .field select, .field textarea { width: 100%; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 0.7rem; color: white; }
     .btn-primary { background: #ff4444; color: white; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 600; }
+    .btn-danger { background: #cc0000; }
+    .btn-success { background: #00cc66; }
     
     .player-overlay { position: fixed; inset: 0; background: #000; z-index: 600; display: none; overflow-y: auto; }
     .player-overlay.open { display: block; }
-    .player-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; }
+    .player-container { max-width: 1400px; margin: 0 auto; padding: 1rem 2rem; }
     .player-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
     .video-player video { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
-    .action-buttons { display: flex; gap: 1rem; margin: 1rem 0; }
+    .action-buttons { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
     .action-btn { background: #2a2a2a; border: none; padding: 0.5rem 1rem; border-radius: 40px; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 8px; }
     .action-btn.liked { background: #ff4444; color: white; }
     .action-btn.disliked { background: #cc0000; color: white; }
@@ -68,7 +72,17 @@
     .subscribe-btn.subscribed { background: #2a2a2a; color: #aaa; }
     .channel-section { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-top: 1px solid #333; border-bottom: 1px solid #333; margin: 1rem 0; }
     .channel-left { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
-    .channel-avatar-lg { width: 48px; height: 48px; border-radius: 50%; background: #ff4444; display: flex; align-items: center; justify-content: center; }
+    .channel-avatar-lg { width: 48px; height: 48px; border-radius: 50%; background: #ff4444; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    
+    .live-chat { background: #1a1a1a; border-radius: 12px; display: flex; flex-direction: column; height: 500px; }
+    .chat-header { padding: 0.8rem; border-bottom: 1px solid #333; background: #ff4444; border-radius: 12px 12px 0 0; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; }
+    .chat-message { margin-bottom: 0.8rem; }
+    .chat-username { font-weight: 600; color: #ff4444; font-size: 0.8rem; }
+    .chat-text { font-size: 0.85rem; margin-top: 2px; }
+    .chat-input-area { display: flex; gap: 0.5rem; padding: 0.8rem; border-top: 1px solid #333; }
+    .chat-input { flex: 1; background: #2a2a2a; border: none; border-radius: 20px; padding: 0.6rem 1rem; color: white; }
+    
     .comment { display: flex; gap: 12px; margin-bottom: 1rem; }
     .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; }
     .comment-input-area { display: flex; gap: 0.5rem; margin-top: 1rem; }
@@ -99,6 +113,7 @@ let currentVideo = null;
 let currentCategory = 'all';
 let selectedFile = null;
 let selectedThumb = null;
+let liveChatChannel = null;
 
 function showToast(msg) {
   const c = document.getElementById('toastContainer');
@@ -136,13 +151,14 @@ async function loadVideos() {
   grid.innerHTML = allVideos.map(v => `
     <div class="video-card" onclick="openPlayer('${v.id}')">
       <div class="thumbnail">
+        ${v.is_live ? '<div class="live-indicator">🔴 LIVE</div>' : ''}
         <img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/1a1a1a/fff?text=🎬'">
         <div class="duration">${v.duration || '0:00'}</div>
       </div>
       <div class="video-info">
         <div class="channel-avatar" onclick="event.stopPropagation();openChannelPage('${v.user_id}')">${(v.username || 'U').charAt(0).toUpperCase()}</div>
         <div class="video-details">
-          <div class="video-title">${escapeHtml(v.title)}</div>
+          <div class="video-title">${escapeHtml(v.title)} ${v.is_live ? '<span style="color:#ff4444;"> 🔴 LIVE</span>' : ''}</div>
           <div class="video-meta">${escapeHtml(v.username || 'Unknown')} • ${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</div>
         </div>
       </div>
@@ -158,17 +174,14 @@ async function openPlayer(videoId) {
   await sb.from('videos').update({ views: (video.views||0)+1 }).eq('id', videoId);
   video.views = (video.views||0)+1;
   
-  // Get channel profile
   const { data: profile } = await sb.from('profiles').select('*').eq('id', video.user_id).single();
   
-  // Check if subscribed
   let isSubscribed = false;
   if(currentUser) {
     const { data: sub } = await sb.from('subscriptions').select('*').eq('subscriber_id', currentUser.id).eq('channel_id', video.user_id).single();
     isSubscribed = !!sub;
   }
   
-  // Check like/dislike status
   let userLiked = false, userDisliked = false;
   if(currentUser) {
     const { data: liked } = await sb.from('video_likes').select('*').eq('user_id', currentUser.id).eq('video_id', videoId).single();
@@ -176,6 +189,8 @@ async function openPlayer(videoId) {
     userLiked = !!liked;
     userDisliked = !!disliked;
   }
+  
+  const isOwner = currentUser && currentUser.id === video.user_id;
   
   const modal = document.createElement('div');
   modal.className = 'player-overlay open';
@@ -186,11 +201,16 @@ async function openPlayer(videoId) {
       <div class="player-grid">
         <div>
           <div class="video-player"><video controls autoplay src="${video.video_url}"></video></div>
-          <h2 style="margin:1rem 0 0.5rem">${escapeHtml(video.title)}</h2>
+          <h2 style="margin:1rem 0 0.5rem">${escapeHtml(video.title)} ${video.is_live ? '<span style="color:#ff4444;"> 🔴 LIVE</span>' : ''}</h2>
           <div class="action-buttons">
             <button class="action-btn ${userLiked ? 'liked' : ''}" id="likeBtn"><i class="fas fa-thumbs-up"></i> <span id="likeCount">${video.likes || 0}</span></button>
             <button class="action-btn ${userDisliked ? 'disliked' : ''}" id="dislikeBtn"><i class="fas fa-thumbs-down"></i> <span id="dislikeCount">${video.dislikes || 0}</span></button>
             <button class="action-btn" id="shareBtn"><i class="fas fa-share"></i> Share</button>
+            ${isOwner ? `
+              <button class="action-btn" id="liveBtn" style="background:${video.is_live ? '#cc0000' : '#00cc66'}">
+                <i class="fas ${video.is_live ? 'fa-stop' : 'fa-video'}"></i> ${video.is_live ? 'End Live' : 'Go Live'}
+              </button>
+            ` : ''}
           </div>
           <div class="channel-section">
             <div class="channel-left" onclick="closePlayer();openChannelPage('${video.user_id}')">
@@ -218,8 +238,19 @@ async function openPlayer(videoId) {
           </div>
         </div>
         <div>
-          <h4>Recommended</h4>
-          <div id="relatedVideos"></div>
+          ${video.is_live ? `
+            <div class="live-chat">
+              <div class="chat-header">🔴 LIVE CHAT</div>
+              <div class="chat-messages" id="chatMessages"></div>
+              <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Say something...">
+                <button class="btn" onclick="sendLiveMessage('${video.id}')">Send</button>
+              </div>
+            </div>
+          ` : `
+            <h4>Recommended</h4>
+            <div id="relatedVideos"></div>
+          `}
         </div>
       </div>
     </div>
@@ -227,15 +258,22 @@ async function openPlayer(videoId) {
   document.body.appendChild(modal);
   
   await loadComments(video.id);
-  loadRelated(video.id);
+  if(!video.is_live) loadRelated(video.id);
+  if(video.is_live) {
+    await loadLiveChat(video.id);
+    subscribeToLiveChat(video.id);
+  }
   
   document.getElementById('likeBtn').onclick = () => toggleLike(video.id);
   document.getElementById('dislikeBtn').onclick = () => toggleDislike(video.id);
   document.getElementById('shareBtn').onclick = () => { navigator.clipboard.writeText(window.location.href); showToast('Link copied!'); };
   document.getElementById('subscribeBtn').onclick = () => toggleSubscribe(video.user_id);
+  if(isOwner && document.getElementById('liveBtn')) {
+    document.getElementById('liveBtn').onclick = () => toggleLive(video.id);
+  }
 }
 
-function closePlayer() { document.getElementById('playerModal')?.remove(); currentVideo = null; }
+function closePlayer() { document.getElementById('playerModal')?.remove(); if(liveChatChannel) sb.removeChannel(liveChatChannel); currentVideo = null; }
 
 async function toggleLike(videoId) {
   if(!currentUser) { openAuth(); return; }
@@ -304,6 +342,60 @@ async function toggleSubscribe(channelId) {
   }
 }
 
+async function toggleLive(videoId) {
+  const video = allVideos.find(v => v.id === videoId);
+  const newLiveStatus = !video.is_live;
+  
+  await sb.from('videos').update({ 
+    is_live: newLiveStatus,
+    live_started_at: newLiveStatus ? new Date() : null
+  }).eq('id', videoId);
+  
+  showToast(newLiveStatus ? 'You are now LIVE! 🔴' : 'Live stream ended');
+  closePlayer();
+  loadVideos();
+}
+
+async function loadLiveChat(videoId) {
+  const { data } = await sb.from('live_chat').select('*').eq('video_id', videoId).order('created_at', { ascending: true });
+  const container = document.getElementById('chatMessages');
+  if(!container) return;
+  container.innerHTML = (data || []).map(m => `
+    <div class="chat-message">
+      <div class="chat-username">${escapeHtml(m.username)}</div>
+      <div class="chat-text">${escapeHtml(m.message)}</div>
+    </div>
+  `).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function subscribeToLiveChat(videoId) {
+  if(liveChatChannel) sb.removeChannel(liveChatChannel);
+  liveChatChannel = sb.channel(`live-chat-${videoId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_chat', filter: `video_id=eq.${videoId}` }, payload => {
+      const container = document.getElementById('chatMessages');
+      if(container) {
+        container.innerHTML += `<div class="chat-message"><div class="chat-username">${escapeHtml(payload.new.username)}</div><div class="chat-text">${escapeHtml(payload.new.message)}</div></div>`;
+        container.scrollTop = container.scrollHeight;
+      }
+    })
+    .subscribe();
+}
+
+window.sendLiveMessage = async function(videoId) {
+  if(!currentUser) { showToast('Sign in to chat'); return; }
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+  if(!message) return;
+  await sb.from('live_chat').insert({
+    video_id: videoId,
+    user_id: currentUser.id,
+    username: currentUser.email?.split('@')[0] || 'User',
+    message: message
+  });
+  input.value = '';
+};
+
 async function loadComments(videoId) {
   const { data } = await sb.from('comments').select('*').eq('video_id', videoId).order('created_at', { ascending: false });
   const container = document.getElementById('commentsList');
@@ -340,7 +432,7 @@ async function postComment(videoId) {
 }
 
 function loadRelated(videoId) {
-  const related = allVideos.filter(v => v.id !== videoId).slice(0, 5);
+  const related = allVideos.filter(v => v.id !== videoId && !v.is_live).slice(0, 5);
   const container = document.getElementById('relatedVideos');
   if(!container) return;
   container.innerHTML = related.map(v => `
@@ -358,14 +450,14 @@ async function openChannelPage(userId) {
   const grid = document.getElementById('videoGrid');
   const title = document.getElementById('sectionHeading');
   if(grid && title) {
-    title.innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(profile?.username || 'Channel')}`;
+    title.innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(profile?.username || 'Channel')} <span style="font-size:0.8rem; color:#aaa;">${formatViews(profile?.subscriber_count || 0)} subscribers</span>`;
     if(!channelVideos || channelVideos.length === 0) {
       grid.innerHTML = '<div style="text-align:center;padding:60px;color:#777">No videos uploaded yet.</div>';
     } else {
       grid.innerHTML = channelVideos.map(v => `
         <div class="video-card" onclick="openPlayer('${v.id}')">
-          <div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/1a1a1a/fff?text=🎬'"><div class="duration">${v.duration || '0:00'}</div></div>
-          <div class="video-info"><div class="channel-avatar">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><div class="video-title">${escapeHtml(v.title)}</div><div class="video-meta">${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</div></div></div>
+          <div class="thumbnail">${v.is_live ? '<div class="live-indicator">🔴 LIVE</div>' : ''}<img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}" onerror="this.src='https://placehold.co/480x270/1a1a1a/fff?text=🎬'"><div class="duration">${v.duration || '0:00'}</div></div>
+          <div class="video-info"><div class="channel-avatar">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><div class="video-title">${escapeHtml(v.title)} ${v.is_live ? '🔴 LIVE' : ''}</div><div class="video-meta">${formatViews(v.views)} views • ${getTimeAgo(v.created_at)}</div></div></div>
         </div>
       `).join('');
     }
@@ -412,7 +504,7 @@ async function uploadVideo() {
       category: document.getElementById('uploadCat').value,
       video_url: publicUrl,
       thumbnail_url: thumbnailUrl,
-      views: 0, likes: 0, dislikes: 0
+      views: 0, likes: 0, dislikes: 0, is_live: false
     });
     if(dbError) throw new Error(dbError.message);
     showToast('Video uploaded!');
@@ -496,7 +588,7 @@ function updateAuthUI() {
 function toggleAvatarMenu() { document.getElementById('avatarMenu')?.classList.toggle('open'); }
 function goHome() { currentCategory = 'all'; document.getElementById('sectionHeading').innerHTML = 'All Videos <span class="live-badge">LIVE</span>'; loadVideos(); }
 function setCategory(cat) { currentCategory = cat; document.getElementById('sectionHeading').innerHTML = cat === 'all' ? 'All Videos' : cat.charAt(0).toUpperCase() + cat.slice(1); loadVideos(); }
-function filterMyVideos() { if(!currentUser) { openAuth(); return; } const myVids = allVideos.filter(v => v.user_id === currentUser.id); const grid = document.getElementById('videoGrid'); if(myVids.length === 0) grid.innerHTML = '<div style="text-align:center;padding:60px;color:#777">No videos yet</div>'; else grid.innerHTML = myVids.map(v => `<div class="video-card" onclick="openPlayer('${v.id}')"><div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}"><div class="duration">${v.duration || '0:00'}</div></div><div class="video-info"><div class="channel-avatar">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><div class="video-title">${escapeHtml(v.title)}</div><div class="video-meta">${formatViews(v.views)} views</div></div></div></div>`).join(''); document.getElementById('sectionHeading').innerHTML = 'My Videos'; }
+function filterMyVideos() { if(!currentUser) { openAuth(); return; } const myVids = allVideos.filter(v => v.user_id === currentUser.id); const grid = document.getElementById('videoGrid'); if(myVids.length === 0) grid.innerHTML = '<div style="text-align:center;padding:60px;color:#777">No videos yet</div>'; else grid.innerHTML = myVids.map(v => `<div class="video-card" onclick="openPlayer('${v.id}')"><div class="thumbnail">${v.is_live ? '<div class="live-indicator">🔴 LIVE</div>' : ''}<img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}"><div class="duration">${v.duration || '0:00'}</div></div><div class="video-info"><div class="channel-avatar">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><div class="video-title">${escapeHtml(v.title)}</div><div class="video-meta">${formatViews(v.views)} views</div></div></div></div>`).join(''); document.getElementById('sectionHeading').innerHTML = 'My Videos'; }
 async function openTrending() { const { data } = await sb.from('videos').select('*').order('views', { ascending: false }).limit(20); if(data) { const grid = document.getElementById('videoGrid'); grid.innerHTML = data.map(v => `<div class="video-card" onclick="openPlayer('${v.id}')"><div class="thumbnail"><img src="${v.thumbnail_url || 'https://placehold.co/480x270/1a1a1a/fff?text=🎬'}"><div class="duration">${v.duration || '0:00'}</div></div><div class="video-info"><div class="channel-avatar">${(v.username || 'U').charAt(0).toUpperCase()}</div><div class="video-details"><div class="video-title">${escapeHtml(v.title)}</div><div class="video-meta">${formatViews(v.views)} views</div></div></div></div>`).join(''); } document.getElementById('sectionHeading').innerHTML = '🔥 Trending'; }
 
 async function init() {
